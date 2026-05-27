@@ -20,41 +20,18 @@
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{background:var(--bg);color:var(--txt);font-family:"DM Sans",sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased}
 .blob{position:fixed;border-radius:50%;filter:blur(90px);pointer-events:none;z-index:0}
-.blob-1{width:550px;height:550px;background:radial-gradient(circle,rgba(245,166,35,.04),transparent 70%);top:-180px;left:-120px;animation:bm 18s ease-in-out infinite alternate}
-.blob-2{width:450px;height:450px;background:radial-gradient(circle,rgba(167,139,250,.03),transparent 70%);bottom:-130px;right:-80px;animation:bm 22s ease-in-out infinite alternate-reverse}
+.blob-1{width:550px;height:550px;background:radial-gradient(circle,rgba(245,166,35,.05),transparent 70%);top:-180px;left:-120px;animation:bm 18s ease-in-out infinite alternate}
+.blob-2{width:450px;height:450px;background:radial-gradient(circle,rgba(167,139,250,.035),transparent 70%);bottom:-130px;right:-80px;animation:bm 22s ease-in-out infinite alternate-reverse}
 @keyframes bm{0%{transform:scale(1)}100%{transform:scale(1.3) translate(25px,18px)}}
 @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes shake{0%,100%{transform:translateX(0)}25%,75%{transform:translateX(-6px)}50%{transform:translateX(6px)}}
-@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
 @keyframes slideIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 .screen{display:none;min-height:100vh;position:relative;z-index:1}
 .screen.vis{display:flex}
 
-/* ── SETUP ── */
-#setup{align-items:center;justify-content:center;padding:40px 16px}
-.setup-wrap{width:500px;max-width:100%;animation:fadeUp .5s ease}
-.setup-logo{font-family:"Syne",sans-serif;font-size:23px;font-weight:800;letter-spacing:-.5px;margin-bottom:3px}
-.setup-logo em{color:var(--gold);font-style:normal}
-.setup-tag{font-size:11.5px;color:var(--mute);margin-bottom:28px;font-family:"DM Mono",monospace}
-.card{background:var(--s1);border:1px solid var(--b);border-radius:var(--r3);padding:26px}
-.card+.card,.card+.btn-primary{margin-top:10px}
-.card-head{font-size:10px;font-family:"Syne",sans-serif;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;color:var(--gold);margin-bottom:14px}
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-.g2.full{grid-column:1/-1}
-.fg{display:flex;flex-direction:column}
-.lbl{font-size:10px;font-weight:600;color:var(--mute);text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px}
-.inp{width:100%;background:var(--s2);border:1px solid var(--b);border-radius:var(--r);padding:10px 12px;color:var(--txt);font-family:"DM Sans",sans-serif;font-size:13px;outline:none;transition:all .2s}
-.inp:focus{border-color:rgba(245,166,35,.45);background:var(--s3)}
-.inp::placeholder{color:var(--mute2)}
-.btn-primary{width:100%;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#000;border:none;border-radius:var(--r);padding:12px;font-family:"Syne",sans-serif;font-size:14px;font-weight:800;cursor:pointer;transition:all .2s;display:block}
-.btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 28px rgba(245,166,35,.25)}
-.btn-primary:disabled{opacity:.4;cursor:default;transform:none;box-shadow:none}
-.err-t{font-size:12px;color:var(--red);margin-top:8px;display:none;font-family:"DM Mono",monospace}
-.info-box{background:var(--grnb);border:1px solid rgba(0,212,136,.18);border-radius:var(--r);padding:11px 13px;font-size:12px;color:rgba(255,255,255,.55);line-height:1.6;margin-bottom:14px}
-.info-box strong{color:var(--grn)}
-
-/* ── AUTH ── */
+/* AUTH */
 #auth{align-items:center;justify-content:center;overflow:hidden}
 .auth-card{background:rgba(14,14,26,.88);backdrop-filter:blur(32px);border:1px solid rgba(255,255,255,.06);border-radius:24px;padding:42px 38px;width:100%;max-width:375px;z-index:10;box-shadow:0 40px 80px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.04);animation:fadeUp .5s ease}
 .auth-top{text-align:center;margin-bottom:30px}
@@ -75,10 +52,10 @@ html,body{background:var(--bg);color:var(--txt);font-family:"DM Sans",sans-serif
 .auth-foot a{color:rgba(255,255,255,.28);cursor:pointer;text-decoration:underline}
 .spn{width:13px;height:13px;border:2px solid rgba(0,0,0,.15);border-top-color:#000;border-radius:50%;animation:spin .7s linear infinite}
 
-/* ── APP ── */
+/* APP */
 #app{flex-direction:row}
-.sidebar{width:218px;background:var(--s1);border-right:1px solid var(--b);display:flex;flex-direction:column;padding:20px 13px;position:sticky;top:0;height:100vh;flex-shrink:0}
-.sb-logo{font-family:"Syne",sans-serif;font-size:16px;font-weight:800;margin-bottom:24px;padding:0 5px;display:flex;align-items:center;gap:7px;letter-spacing:-.2px}
+.sidebar{width:210px;background:var(--s1);border-right:1px solid var(--b);display:flex;flex-direction:column;padding:20px 12px;position:sticky;top:0;height:100vh;flex-shrink:0}
+.sb-logo{font-family:"Syne",sans-serif;font-size:16px;font-weight:800;margin-bottom:24px;padding:0 6px;display:flex;align-items:center;gap:7px}
 .sb-logo em{color:var(--gold);font-style:normal}
 .ni{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:9px;cursor:pointer;font-size:13px;font-weight:500;color:var(--mute);transition:all .2s;margin-bottom:2px;border:1px solid transparent;background:none;width:100%;text-align:left;font-family:"DM Sans",sans-serif}
 .ni:hover{color:var(--txt);background:var(--s2)}
@@ -92,24 +69,24 @@ html,body{background:var(--bg);color:var(--txt);font-family:"DM Sans",sans-serif
 .user-rl{font-size:9px;color:var(--mute);font-family:"DM Mono",monospace}
 .btn-out{width:100%;background:none;border:1px solid var(--b);border-radius:8px;padding:7px;color:var(--mute);font-size:12px;cursor:pointer;transition:all .2s;font-family:"DM Sans",sans-serif;display:flex;align-items:center;justify-content:center;gap:5px}
 .btn-out:hover{border-color:var(--red);color:var(--red)}
-.main{flex:1;overflow-y:auto;padding:30px 32px;max-width:1100px}
+.main{flex:1;overflow-y:auto;padding:30px 32px}
 
-/* ── PAGE HEADER ── */
+/* PAGE HEADER */
 .ph{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:22px;gap:14px}
 .ph-title{font-family:"Syne",sans-serif;font-size:21px;font-weight:800;letter-spacing:-.3px}
 .ph-sub{font-size:11.5px;color:var(--mute);margin-top:3px;font-family:"DM Mono",monospace}
 .btn-new{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#000;border:none;border-radius:9px;padding:9px 16px;font-family:"Syne",sans-serif;font-size:13px;font-weight:800;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .2s;white-space:nowrap;flex-shrink:0}
 .btn-new:hover{transform:translateY(-1px);box-shadow:0 5px 18px rgba(245,166,35,.22)}
 
-/* ── STATS ── */
+/* STATS */
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-bottom:22px}
-.stat{background:var(--s1);border:1px solid var(--b);border-radius:var(--r2);padding:15px 17px;transition:border-color .2s,transform .2s;cursor:default}
+.stat{background:var(--s1);border:1px solid var(--b);border-radius:var(--r2);padding:15px 17px;transition:border-color .2s,transform .2s}
 .stat:hover{border-color:var(--b3);transform:translateY(-1px)}
 .stat-l{font-size:9.5px;color:var(--mute);text-transform:uppercase;letter-spacing:1px;font-family:"Syne",sans-serif;font-weight:700;margin-bottom:7px}
 .stat-n{font-family:"Syne",sans-serif;font-size:24px;font-weight:800;letter-spacing:-1px}
 .cg{color:var(--gold)}.cgr{color:var(--grn)}.cb{color:var(--blue)}.cp{color:var(--pur)}
 
-/* ── SEARCH ── */
+/* SEARCH */
 .toolbar{margin-bottom:14px}
 .srch{position:relative}
 .srch-ico{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--mute);font-size:13px;pointer-events:none}
@@ -117,81 +94,57 @@ html,body{background:var(--bg);color:var(--txt);font-family:"DM Sans",sans-serif
 .srch-inp:focus{border-color:rgba(245,166,35,.35);background:var(--s2)}
 .srch-inp::placeholder{color:var(--mute2)}
 
-/* ── FILE CARDS ── */
-.flist{display:flex;flex-direction:column;gap:7px}
+/* FILE CARDS */
+.flist{display:flex;flex-direction:column;gap:8px}
 .fcard{background:var(--s1);border:1px solid var(--b);border-radius:var(--r2);overflow:hidden;transition:border-color .2s,box-shadow .2s;animation:fadeUp .3s ease}
-.fcard:hover{border-color:var(--b3);box-shadow:0 4px 18px rgba(0,0,0,.2)}
-.fc-top{display:grid;grid-template-columns:1fr auto auto auto auto;align-items:center;gap:14px;padding:14px 16px}
-.fc-name{display:flex;align-items:center;gap:9px;min-width:0}
-.fc-ico{width:32px;height:32px;background:var(--s3);border:1px solid var(--b2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.fcard:hover{border-color:var(--b3);box-shadow:0 4px 20px rgba(0,0,0,.22)}
+.fc-top{display:flex;align-items:center;gap:12px;padding:14px 16px;flex-wrap:wrap}
+.fc-name{display:flex;align-items:center;gap:9px;flex:1;min-width:0}
+.fc-ico{width:34px;height:34px;background:var(--s3);border:1px solid var(--b2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
 .fc-t{font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.fc-m{font-size:10.5px;color:var(--mute);margin-top:1px;font-family:"DM Mono",monospace}
-.fc-col{display:flex;flex-direction:column;align-items:center;gap:3px;flex-shrink:0}
-.fc-col-l{font-size:9px;color:var(--mute);text-transform:uppercase;letter-spacing:.7px;font-family:"Syne",sans-serif;font-weight:700}
-.fc-btns{display:flex;gap:5px;align-items:center}
+.fc-m{font-size:10.5px;color:var(--mute);margin-top:2px;font-family:"DM Mono",monospace}
+.fc-right{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.fc-actions{display:flex;gap:6px;padding:11px 16px;border-top:1px solid var(--b);flex-wrap:wrap}
 
-/* ── STATUS BADGE ── */
+/* BADGE */
 .sb{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:10.5px;font-weight:600;border:1px solid;white-space:nowrap}
 .sb.active{background:var(--grnb);color:var(--grn);border-color:rgba(0,212,136,.18)}
 .sb.inactive{background:var(--redb);color:var(--red);border-color:rgba(255,77,106,.18)}
-.sb.expired{background:var(--goldb);color:var(--gold);border-color:rgba(245,166,35,.18)}
 .sd{width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0}
+.user-count{font-size:11px;color:var(--pur);font-family:"DM Mono",monospace;padding:3px 9px;background:var(--purb);border:1px solid rgba(167,139,250,.18);border-radius:8px;white-space:nowrap}
 
-/* ── TOGGLE ── */
-.tog{position:relative;width:33px;height:18px;cursor:pointer;flex-shrink:0}
+/* TOGGLE */
+.tog{position:relative;width:34px;height:19px;cursor:pointer;flex-shrink:0}
 .tog input{opacity:0;width:0;height:0;position:absolute}
-.tog-t{position:absolute;inset:0;background:var(--s3);border:1px solid var(--b2);border-radius:9px;transition:all .22s}
+.tog-t{position:absolute;inset:0;background:var(--s3);border:1px solid var(--b2);border-radius:10px;transition:all .22s}
 .tog input:checked+.tog-t{background:var(--grn);border-color:var(--grn)}
-.tog-t::after{content:"";position:absolute;top:2px;left:2px;width:12px;height:12px;background:var(--mute);border-radius:50%;transition:all .22s;box-shadow:0 1px 3px rgba(0,0,0,.4)}
+.tog-t::after{content:"";position:absolute;top:2px;left:2px;width:13px;height:13px;background:var(--mute);border-radius:50%;transition:all .22s;box-shadow:0 1px 3px rgba(0,0,0,.4)}
 .tog input:checked+.tog-t::after{transform:translateX(15px);background:#fff}
 
-/* ── EXPIRY ── */
-.exp-row{display:flex;align-items:center;gap:4px}
-.exp-in{background:var(--s2);border:1px solid var(--b);border-radius:7px;padding:4px 6px;color:var(--txt);font-size:10.5px;outline:none;cursor:pointer;font-family:"DM Mono",monospace;transition:border-color .2s;width:104px}
-.exp-in:focus{border-color:rgba(245,166,35,.35)}
-.exp-in::-webkit-calendar-picker-indicator{filter:invert(.3);width:10px}
-.bxs{border:1px solid var(--b);border-radius:6px;padding:3px 7px;font-size:10.5px;cursor:pointer;transition:all .2s;background:none;color:var(--mute);font-family:"DM Sans",sans-serif}
-.bxs.set{background:var(--gold);color:#000;border-color:var(--gold);font-weight:700}
-.bxs.clr:hover{color:var(--red);border-color:rgba(255,77,106,.3)}
-
-/* ── ACTION BTNS ── */
-.abt{border:1px solid var(--b);border-radius:8px;padding:6px 10px;font-size:11.5px;cursor:pointer;transition:all .2s;font-family:"DM Sans",sans-serif;background:var(--s2);color:var(--mute);white-space:nowrap;display:flex;align-items:center;gap:4px}
+/* ACTION BTNS */
+.abt{border:1px solid var(--b);border-radius:8px;padding:6px 11px;font-size:11.5px;cursor:pointer;transition:all .2s;font-family:"DM Sans",sans-serif;background:var(--s2);color:var(--mute);white-space:nowrap;display:flex;align-items:center;gap:5px}
 .abt:hover{color:var(--txt);border-color:var(--b3);background:var(--s3)}
 .abt.copy:hover{color:var(--blue);border-color:rgba(61,158,255,.3);background:var(--blueb)}
-.abt.gh:hover{color:var(--pur);border-color:rgba(167,139,250,.3);background:var(--purb)}
 .abt.del:hover{color:var(--red);border-color:rgba(255,77,106,.3);background:var(--redb)}
-.abt.pw-b{color:var(--gold);border-color:rgba(245,166,35,.22);background:var(--goldb)}
-.abt.pw-b:hover{background:rgba(245,166,35,.16)}
-.vn{font-family:"Syne",sans-serif;font-size:15px;font-weight:800;color:var(--blue)}
+.abt.pw-b{color:var(--gold);border-color:rgba(245,166,35,.22);background:var(--goldb);font-weight:600}
+.abt.pw-b:hover{background:rgba(245,166,35,.16);border-color:rgba(245,166,35,.4)}
 
-/* ── UPLOAD BAR ── */
-.up-bar{background:var(--s2);border-top:1px solid var(--b);padding:10px 16px;display:none;align-items:center;gap:10px}
-.up-bar.vis{display:flex}
-.up-bar-label{font-size:12px;font-family:"DM Mono",monospace;color:var(--mute);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.up-prog-wrap{flex:2;background:var(--s3);border-radius:4px;height:4px;overflow:hidden}
-.up-prog-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:4px;transition:width .3s;width:0}
-.up-pct{font-size:11px;font-family:"DM Mono",monospace;color:var(--gold);min-width:32px;text-align:right}
-
-/* ── TABS ── */
+/* TABS */
 .tab{display:none}.tab.vis{display:block}
-/* gh/settings cards */
-.gc{background:var(--s1);border:1px solid var(--b);border-radius:var(--r2);padding:20px;margin-bottom:10px}
-.gc-head{font-size:10px;font-family:"Syne",sans-serif;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;color:var(--gold);margin-bottom:14px}
-.gh-rrow{background:var(--s2);border:1px solid var(--b);border-radius:var(--r);padding:12px 14px;display:flex;align-items:center;justify-content:space-between}
-.gh-rn{font-size:13.5px;font-weight:600}.gh-ru{font-size:11px;color:var(--mute);font-family:"DM Mono",monospace;margin-top:1px}
-.gh-fr{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--b);font-size:12.5px}
-.gh-fr:last-child{border-bottom:none}
-.gh-fn{display:flex;align-items:center;gap:7px;font-family:"DM Mono",monospace}
-.gh-sha{font-size:10px;color:var(--mute)}
-.bo{background:none;border:1px solid var(--b);border-radius:7px;padding:4px 10px;font-size:11.5px;color:var(--mute);cursor:pointer;transition:all .2s;font-family:"DM Sans",sans-serif}
-.bo:hover{border-color:var(--gold);color:var(--gold)}
+
+/* SETTINGS */
+.gc{background:var(--s1);border:1px solid var(--b);border-radius:var(--r2);padding:22px}
 .sg-s{font-size:10px;letter-spacing:1.8px;text-transform:uppercase;font-family:"Syne",sans-serif;font-weight:700;color:var(--gold);margin:20px 0 11px;border-bottom:1px solid var(--b);padding-bottom:7px}
 .sg-s:first-child{margin-top:0}
+.lbl{font-size:10px;font-weight:600;color:var(--mute);text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px;display:block}
+.inp{width:100%;background:var(--s2);border:1px solid var(--b);border-radius:var(--r);padding:10px 12px;color:var(--txt);font-family:"DM Sans",sans-serif;font-size:13px;outline:none;transition:all .2s}
+.inp:focus{border-color:rgba(245,166,35,.45);background:var(--s3)}
+.inp::placeholder{color:var(--mute2)}
+.inp[readonly]{opacity:.45;cursor:default}
+.fg{display:flex;flex-direction:column;gap:4px}
 
-/* ════════════════
-   OVERLAYS
-════════════════ */
-.ov{position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:500;display:none;align-items:center;justify-content:center;backdrop-filter:blur(8px);padding:20px}
+/* OVERLAYS */
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:500;display:none;align-items:center;justify-content:center;backdrop-filter:blur(8px);padding:20px}
 .ov.vis{display:flex}
 .modal{background:var(--s1);border:1px solid var(--b);border-radius:var(--r3);max-width:94vw;animation:fadeUp .3s ease;overflow:hidden}
 .mhdr{padding:20px 24px 16px;border-bottom:1px solid var(--b)}
@@ -201,9 +154,12 @@ html,body{background:var(--bg);color:var(--txt);font-family:"DM Sans",sans-serif
 .mfoot{padding:0 24px 20px;display:flex;gap:9px}
 .btn-sec{flex:1;background:none;border:1px solid var(--b);border-radius:9px;padding:10px;color:var(--mute);font-family:"DM Sans",sans-serif;font-size:13px;cursor:pointer;transition:all .2s}
 .btn-sec:hover{border-color:var(--mute);color:var(--txt)}
+.btn-primary{width:100%;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#000;border:none;border-radius:var(--r);padding:11px;font-family:"Syne",sans-serif;font-size:13px;font-weight:800;cursor:pointer;transition:all .2s}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(245,166,35,.22)}
+.btn-primary:disabled{opacity:.4;cursor:default;transform:none}
 
-/* Upload modal */
-.upm{width:440px}
+/* UPLOAD MODAL */
+.upm{width:420px}
 .dz{border:2px dashed var(--b);border-radius:var(--r);padding:32px 20px;text-align:center;cursor:pointer;transition:all .2s;background:var(--s2);position:relative}
 .dz:hover,.dz.ov2{border-color:var(--gold);background:var(--goldb)}
 .dz input{position:absolute;inset:0;opacity:0;cursor:pointer}
@@ -212,72 +168,84 @@ html,body{background:var(--bg);color:var(--txt);font-family:"DM Sans",sans-serif
 .dz-s{font-size:11.5px;color:var(--mute)}
 .sel-f{margin-top:9px;font-size:11.5px;color:var(--grn);font-family:"DM Mono",monospace;white-space:pre-line;line-height:1.6}
 .size-warn{font-size:11px;color:var(--gold);font-family:"DM Mono",monospace;margin-top:6px;display:none}
+.prog{background:var(--s2);border-radius:4px;height:4px;overflow:hidden;margin-top:12px;display:none}
+.prog-f{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:4px;transition:width .3s;width:0}
 
-/* Password modal */
-.pwm{width:500px}
-.pw-ftag{display:inline-flex;align-items:center;gap:5px;background:var(--s2);border:1px solid var(--b);border-radius:7px;padding:4px 10px;font-size:11.5px;font-family:"DM Mono",monospace;color:var(--mute);margin-top:3px}
-.pw-add{display:flex;gap:7px;align-items:flex-end;margin-bottom:16px}
-.pw-add .fg{flex:1.3}
-.pw-add .fg2{flex:1}
-.btn-add{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#000;border:none;border-radius:8px;padding:10px 14px;font-family:"Syne",sans-serif;font-size:12.5px;font-weight:800;cursor:pointer;transition:all .2s;white-space:nowrap;align-self:flex-end}
-.btn-add:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(245,166,35,.22)}
-.pw-list{display:flex;flex-direction:column;gap:7px;max-height:280px;overflow-y:auto;padding-right:3px}
-.pw-list:empty::after{content:"No passwords yet. Add one above.";display:block;text-align:center;color:var(--mute);font-size:12px;padding:22px 0;font-family:"DM Mono",monospace}
-.pwi{background:var(--s2);border:1px solid var(--b);border-radius:10px;padding:11px 13px;display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:11px;transition:border-color .2s;animation:slideIn .2s ease}
-.pwi:hover{border-color:var(--b3)}
-.pwi.off{opacity:.48}
-.pwi-label{font-size:13px;font-weight:600}
-.pwi-views{font-size:10.5px;font-family:"DM Mono",monospace;color:var(--mute);margin-top:2px}
-.pwi-views em{color:var(--blue);font-style:normal;font-weight:600}
-.pw-del{background:none;border:1px solid var(--b);border-radius:7px;padding:5px 8px;font-size:12px;color:var(--mute);cursor:pointer;transition:all .2s}
-.pw-del:hover{color:var(--red);border-color:rgba(255,77,106,.3);background:var(--redb)}
-.pwibox{background:var(--purb);border:1px solid rgba(167,139,250,.15);border-radius:9px;padding:10px 13px;font-size:11.5px;color:rgba(255,255,255,.48);line-height:1.6;margin-bottom:14px}
-.pwibox strong{color:var(--pur)}
+/* USER MANAGEMENT MODAL */
+.pwm{width:540px;max-height:88vh;overflow-y:auto}
+.pw-info{background:var(--purb);border:1px solid rgba(167,139,250,.15);border-radius:9px;padding:10px 13px;font-size:11.5px;color:rgba(255,255,255,.48);line-height:1.6;margin-bottom:16px}
+.pw-info strong{color:var(--pur)}
 .div-line{display:flex;align-items:center;gap:9px;margin-bottom:11px}
 .div-line span{font-size:9.5px;font-family:"Syne",sans-serif;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--mute);white-space:nowrap}
 .div-line::before,.div-line::after{content:"";flex:1;height:1px;background:var(--b)}
+.add-grid{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;align-items:flex-end;margin-bottom:16px}
+.btn-add{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#000;border:none;border-radius:8px;padding:10px 13px;font-family:"Syne",sans-serif;font-size:12.5px;font-weight:800;cursor:pointer;white-space:nowrap;transition:all .2s;align-self:flex-end}
+.btn-add:hover{transform:translateY(-1px)}
 .irel{position:relative}
 .irel .inp{padding-right:32px}
-.eye{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--mute);cursor:pointer;font-size:13px;padding:0;transition:color .2s}
+.eye{position:absolute;right:9px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--mute);cursor:pointer;font-size:12px;padding:0;transition:color .2s}
 .eye:hover{color:var(--txt)}
+.user-list{display:flex;flex-direction:column;gap:7px;max-height:300px;overflow-y:auto;padding-right:2px}
+.user-list:empty::after{content:"No users yet. Add one above.";display:block;text-align:center;color:var(--mute);font-size:12px;padding:22px 0;font-family:"DM Mono",monospace}
+.ui{background:var(--s2);border:1px solid var(--b);border-radius:10px;overflow:hidden;transition:border-color .2s;animation:slideIn .2s ease}
+.ui:hover{border-color:var(--b3)}
+.ui.off{opacity:.45}
+.ui-top{display:grid;grid-template-columns:1fr auto auto auto;align-items:center;gap:10px;padding:11px 13px}
+.ui-id{font-size:13px;font-weight:700;font-family:"DM Mono",monospace;color:var(--gold)}
+.ui-meta{font-size:10px;color:var(--mute);margin-top:2px;font-family:"DM Mono",monospace;display:flex;gap:10px}
+.ui-meta em{color:var(--blue);font-style:normal}
+.ui-exp-txt{color:var(--mute)}
+.ui-exp-txt.red{color:var(--red)}
+.ui-exp-txt.orange{color:var(--gold)}
+.ui-edit-panel{background:var(--s3);border-top:1px solid var(--b);padding:12px 13px;display:none;flex-direction:column;gap:10px}
+.ui-edit-panel.open{display:flex}
+.edit-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.edit-btns{display:flex;gap:7px}
+.bxs{border:1px solid var(--b);border-radius:7px;padding:5px 10px;font-size:11.5px;cursor:pointer;background:none;color:var(--mute);transition:all .2s;font-family:"DM Sans",sans-serif}
+.bxs:hover{border-color:var(--b3);color:var(--txt)}
+.bxs.edit:hover{color:var(--blue);border-color:rgba(61,158,255,.3);background:var(--blueb)}
+.bxs.del:hover{color:var(--red);border-color:rgba(255,77,106,.3);background:var(--redb)}
+.bxs.save{background:var(--gold);color:#000;border-color:var(--gold);font-weight:700}
+.bxs.save:hover{background:var(--gold2)}
 
-/* ════════════════
-   CLIENT VIEW
-════════════════ */
+/* CLIENT LOGIN */
 #cv{flex-direction:column;align-items:center;justify-content:center;min-height:100vh;overflow:hidden}
 .cviw{position:fixed;inset:0;z-index:20;display:none}
 .cviw iframe{width:100%;height:100%;border:none;display:block}
-.cv-c{position:relative;z-index:10;width:100%;max-width:390px;padding:20px;animation:fadeUp .5s ease}
-.cv-card{background:rgba(14,14,26,.9);backdrop-filter:blur(32px);border:1px solid rgba(255,255,255,.06);border-radius:22px;padding:38px 34px;box-shadow:0 40px 80px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.04)}
-.cv-ico{font-size:34px;text-align:center;margin-bottom:9px;animation:pulse 6s ease-in-out infinite}
-.cv-title{font-family:"Syne",sans-serif;font-size:21px;font-weight:800;text-align:center;background:linear-gradient(135deg,#ffe066,#f5a623,#e8820c);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:3px}
-.cv-ftag{text-align:center;font-size:11px;color:rgba(255,255,255,.24);font-family:"DM Mono",monospace;margin-bottom:24px;padding:5px 11px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05);border-radius:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.cv-lbl{display:block;font-size:9.5px;font-weight:600;color:rgba(255,255,255,.22);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px}
-.cv-iw{position:relative;margin-bottom:11px}
-.cv-inp{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:12px 38px 12px 13px;color:#fff;font-family:"DM Sans",sans-serif;font-size:14px;outline:none;transition:all .2s;letter-spacing:1.5px}
-.cv-inp:focus{border-color:rgba(245,166,35,.38);background:rgba(255,255,255,.07)}
-.cv-inp::placeholder{letter-spacing:0;color:rgba(255,255,255,.13)}
-.cv-eye{position:absolute;right:11px;top:50%;transform:translateY(-50%);background:none;border:none;color:rgba(255,255,255,.22);cursor:pointer;font-size:13px;padding:0}
-.cv-btn{width:100%;background:linear-gradient(135deg,#f5a623,#e8820c);border:none;border-radius:10px;padding:12px;color:#000;font-family:"Syne",sans-serif;font-size:14px;font-weight:800;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:7px}
-.cv-btn:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 7px 22px rgba(245,166,35,.28)}
+.cv-c{position:relative;z-index:10;width:100%;max-width:400px;padding:20px;animation:fadeUp .5s ease}
+.cv-card{background:rgba(10,10,20,.92);backdrop-filter:blur(40px);border:1px solid rgba(255,255,255,.06);border-radius:24px;padding:44px 40px;box-shadow:0 50px 100px rgba(0,0,0,.8),inset 0 1px 0 rgba(255,255,255,.05)}
+.cv-top{text-align:center;margin-bottom:30px}
+.cv-ico{font-size:38px;display:block;margin-bottom:11px;animation:pulse 5s ease-in-out infinite}
+.cv-brand{font-family:"Syne",sans-serif;font-size:23px;font-weight:800;background:linear-gradient(135deg,#ffe566,#f5a623,#e8820c);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:3px}
+.cv-tag{font-size:10px;color:rgba(255,255,255,.2);letter-spacing:1.5px;text-transform:uppercase;font-family:"DM Mono",monospace}
+.cv-sep{width:34px;height:2px;background:linear-gradient(90deg,rgba(245,166,35,.75),transparent);margin:0 auto 26px;border-radius:2px}
+.cv-lbl{display:block;font-size:9.5px;font-weight:700;color:rgba(255,255,255,.22);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;font-family:"Syne",sans-serif}
+.cv-field{position:relative;margin-bottom:12px}
+.cv-inp{width:100%;background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.06);border-radius:11px;padding:13px 14px;color:#fff;font-family:"DM Sans",sans-serif;font-size:14px;outline:none;transition:all .25s}
+.cv-inp:focus{border-color:rgba(245,166,35,.4);background:rgba(255,255,255,.07);box-shadow:0 0 0 3px rgba(245,166,35,.07)}
+.cv-inp::placeholder{color:rgba(255,255,255,.12)}
+.cv-inp.pw{letter-spacing:2px}
+.cv-inp.pw::placeholder{letter-spacing:0}
+.cv-eye{position:absolute;right:13px;top:50%;transform:translateY(-50%);background:none;border:none;color:rgba(255,255,255,.2);cursor:pointer;font-size:14px;padding:0;transition:color .2s}
+.cv-eye:hover{color:rgba(255,255,255,.5)}
+.cv-btn{width:100%;background:linear-gradient(135deg,#f5a623,#e8820c);border:none;border-radius:11px;padding:13px;color:#000;font-family:"Syne",sans-serif;font-size:15px;font-weight:800;cursor:pointer;margin-top:4px;transition:all .25s;display:flex;align-items:center;justify-content:center;gap:8px}
+.cv-btn:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 8px 28px rgba(245,166,35,.32)}
 .cv-btn:disabled{opacity:.4;cursor:default;transform:none}
-.cv-err{background:rgba(255,77,106,.07);border:1px solid rgba(255,77,106,.16);border-radius:8px;padding:9px 12px;font-size:12.5px;color:var(--red);margin-top:9px;display:none;text-align:center}
+.cv-err{background:rgba(255,77,106,.07);border:1px solid rgba(255,77,106,.18);border-radius:9px;padding:10px 13px;font-size:12.5px;color:#ff6b7a;margin-top:10px;display:none;text-align:center}
 .cv-err.vis{display:block;animation:shake .3s ease}
-.cv-att{text-align:center;margin-top:7px;font-size:11px;color:rgba(255,255,255,.18);font-family:"DM Mono",monospace}
-/* error states */
+.cv-att{text-align:center;margin-top:8px;font-size:11px;color:rgba(255,255,255,.16);font-family:"DM Mono",monospace}
 .cv-st{text-align:center;display:none;animation:fadeUp .5s ease}
-.cv-st-ico{font-size:50px;margin-bottom:13px}
-.cv-st-t{font-family:"Syne",sans-serif;font-size:19px;font-weight:800;margin-bottom:7px}
+.cv-st-ico{font-size:52px;margin-bottom:14px}
+.cv-st-t{font-family:"Syne",sans-serif;font-size:20px;font-weight:800;margin-bottom:8px}
 .cv-st-s{font-size:13px;color:var(--mute);max-width:290px;margin:0 auto;line-height:1.7}
-.cv-pill{display:inline-block;margin-top:12px;padding:4px 13px;border-radius:20px;font-size:10.5px;font-family:"Syne",sans-serif;font-weight:700;letter-spacing:.5px;border:1px solid}
+.cv-pill{display:inline-block;margin-top:12px;padding:4px 14px;border-radius:20px;font-size:10.5px;font-family:"Syne",sans-serif;font-weight:700;letter-spacing:.5px;border:1px solid}
 .cv-pill.r{color:var(--red);border-color:rgba(255,77,106,.28);background:var(--redb)}
-.cv-pill.g{color:var(--gold);border-color:rgba(245,166,35,.28);background:var(--goldb)}
 .cv-load{text-align:center;animation:fadeUp .3s ease}
-.cv-spin{width:40px;height:40px;border:3px solid rgba(245,166,35,.1);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px}
+.cv-spin{width:42px;height:42px;border:3px solid rgba(245,166,35,.1);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px}
 .cv-load-t{font-family:"Syne",sans-serif;font-size:13.5px;font-weight:700;color:rgba(255,255,255,.28)}
 
-/* ── TOAST ── */
-#toast{position:fixed;bottom:22px;right:22px;background:var(--s1);border:1px solid var(--b);border-radius:11px;padding:10px 15px;font-size:12px;display:flex;align-items:center;gap:8px;z-index:9999;box-shadow:0 18px 36px rgba(0,0,0,.5);transform:translateY(55px);opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1);max-width:300px}
+/* TOAST */
+#toast{position:fixed;bottom:22px;right:22px;background:var(--s1);border:1px solid var(--b);border-radius:11px;padding:10px 16px;font-size:12.5px;display:flex;align-items:center;gap:9px;z-index:9999;box-shadow:0 18px 36px rgba(0,0,0,.5);transform:translateY(55px);opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1);max-width:300px}
 #toast.on{transform:translateY(0);opacity:1}
 #toast.ok{border-color:rgba(0,212,136,.22)}
 #toast.err{border-color:rgba(255,77,106,.22)}
@@ -288,7 +256,7 @@ html,body{background:var(--bg);color:var(--txt);font-family:"DM Sans",sans-serif
 .empty-d{font-size:12px}
 ::-webkit-scrollbar{width:4px}
 ::-webkit-scrollbar-thumb{background:var(--b3);border-radius:4px}
-@media(max-width:700px){.sidebar{display:none}.main{padding:18px 14px}.stats{grid-template-columns:1fr 1fr}.fc-top{grid-template-columns:1fr auto auto}}
+@media(max-width:700px){.sidebar{display:none}.main{padding:18px 14px}.stats{grid-template-columns:1fr 1fr}}
 </style>
 </head>
 <body>
@@ -297,51 +265,51 @@ html,body{background:var(--bg);color:var(--txt);font-family:"DM Sans",sans-serif
 
 <!-- CLIENT VIEW -->
 <div id="cv" class="screen">
-  <div class="cviw" id="cviw"><iframe id="cviframe" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe></div>
+  <div class="cviw" id="cviw">
+    <iframe id="cviframe" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+  </div>
   <div class="cv-c">
-    <div class="cv-load" id="cv-load"><div class="cv-spin"></div><div class="cv-load-t">Verifying access...</div></div>
-    <div class="cv-card" id="cv-pwcard" style="display:none">
-      <div class="cv-ico">&#128272;</div>
-      <div class="cv-title">Protected File</div>
-      <div class="cv-ftag" id="cv-ftag">file.html</div>
+    <div class="cv-load" id="cv-load">
+      <div class="cv-spin"></div>
+      <div class="cv-load-t">Verifying access...</div>
+    </div>
+    <div class="cv-card" id="cv-logincard" style="display:none">
+      <div class="cv-top">
+        <span class="cv-ico">&#128737;</span>
+        <div class="cv-brand" id="cv-brand">Secure Access</div>
+        <div class="cv-tag" id="cv-tag">Protected Content</div>
+      </div>
+      <div class="cv-sep"></div>
+      <label class="cv-lbl">User ID</label>
+      <div class="cv-field">
+        <input class="cv-inp" id="cv-uid" type="text" placeholder="Enter your User ID" autocomplete="username"/>
+      </div>
       <label class="cv-lbl">Password</label>
-      <div class="cv-iw"><input class="cv-inp" id="cv-pwinp" type="password" placeholder="Enter password to access" onkeydown="if(event.key==='Enter')cvCheck()"/><button class="cv-eye" onclick="cvEye()">&#128065;</button></div>
-      <button class="cv-btn" id="cv-pwbtn" onclick="cvCheck()">Unlock &#8594;</button>
-      <div class="cv-err" id="cv-err">Incorrect password. Try again.</div>
+      <div class="cv-field">
+        <input class="cv-inp pw" id="cv-pw" type="password" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;" onkeydown="if(event.key==='Enter')cvLogin()"/>
+        <button class="cv-eye" onclick="cvEye()">&#128065;</button>
+      </div>
+      <button class="cv-btn" id="cv-submit" onclick="cvLogin()">Access Content &#8594;</button>
+      <div class="cv-err" id="cv-err">Invalid User ID or Password.</div>
       <div class="cv-att" id="cv-att"></div>
     </div>
-    <div class="cv-st" id="cv-inactive"><div class="cv-st-ico">&#128274;</div><div class="cv-st-t">Access Revoked</div><div class="cv-st-s">This link has been deactivated. Please contact the owner.</div><span class="cv-pill r">INACTIVE</span></div>
-    <div class="cv-st" id="cv-expired"><div class="cv-st-ico">&#9200;</div><div class="cv-st-t">Link Expired</div><div class="cv-st-s">This link has passed its expiry date.</div><span class="cv-pill g">EXPIRED</span></div>
-    <div class="cv-st" id="cv-notfound"><div class="cv-st-ico">&#128269;</div><div class="cv-st-t">Not Found</div><div class="cv-st-s">This link doesn't exist or has been removed.</div></div>
-    <div class="cv-st" id="cv-locked"><div class="cv-st-ico">&#128683;</div><div class="cv-st-t">Access Locked</div><div class="cv-st-s">Too many incorrect attempts. Session is locked.</div><span class="cv-pill r">LOCKED</span></div>
-  </div>
-</div>
-
-<!-- SETUP -->
-<div id="setup" class="screen">
-  <div class="setup-wrap">
-    <div class="setup-logo">Dash<em>Vault</em> Pro</div>
-    <div class="setup-tag">// one-time setup</div>
-    <div class="card">
-      <div class="card-head">&#128293; Firebase</div>
-      <div class="info-box">&#10003; Firebase Storage <strong>লাগবে না</strong> — HTML content সরাসরি Firestore এ save হবে। শুধু Auth + Firestore হলেই চলবে।</div>
-      <div class="g2">
-        <div class="fg"><label class="lbl">API Key</label><input class="inp" id="s-ak" placeholder="AIzaSy..."/></div>
-        <div class="fg"><label class="lbl">Auth Domain</label><input class="inp" id="s-ad" placeholder="xxx.firebaseapp.com"/></div>
-        <div class="fg"><label class="lbl">Project ID</label><input class="inp" id="s-pid" placeholder="my-project"/></div>
-        <div class="fg"><label class="lbl">App ID</label><input class="inp" id="s-aid" placeholder="1:xxx:web:xxx"/></div>
-      </div>
+    <div class="cv-st" id="cv-inactive">
+      <div class="cv-st-ico">&#128274;</div>
+      <div class="cv-st-t">Access Revoked</div>
+      <div class="cv-st-s">This link has been deactivated by the owner.</div>
+      <span class="cv-pill r">INACTIVE</span>
     </div>
-    <div class="card">
-      <div class="card-head">&#128025; GitHub <span style="font-size:9px;color:var(--mute);letter-spacing:0;font-weight:400;text-transform:none">optional</span></div>
-      <div class="g2">
-        <div class="fg full" style="grid-column:1/-1"><label class="lbl">Personal Access Token</label><input class="inp" id="s-gt" type="password" placeholder="ghp_..."/></div>
-        <div class="fg"><label class="lbl">Username</label><input class="inp" id="s-gu" placeholder="username"/></div>
-        <div class="fg"><label class="lbl">Repository</label><input class="inp" id="s-gr" placeholder="my-dashboards"/></div>
-      </div>
+    <div class="cv-st" id="cv-notfound">
+      <div class="cv-st-ico">&#128269;</div>
+      <div class="cv-st-t">Not Found</div>
+      <div class="cv-st-s">This link doesn't exist or has been removed.</div>
     </div>
-    <button class="btn-primary" onclick="saveSetup()" style="margin-top:10px">Save &amp; Continue &#8594;</button>
-    <div class="err-t" id="setup-err"></div>
+    <div class="cv-st" id="cv-locked">
+      <div class="cv-st-ico">&#128683;</div>
+      <div class="cv-st-t">Access Locked</div>
+      <div class="cv-st-s">Too many incorrect attempts. Session is locked.</div>
+      <span class="cv-pill r">LOCKED</span>
+    </div>
   </div>
 </div>
 
@@ -349,18 +317,18 @@ html,body{background:var(--bg);color:var(--txt);font-family:"DM Sans",sans-serif
 <div id="auth" class="screen">
   <div class="auth-card">
     <div class="auth-top">
-      <span class="auth-ico">&#128737;</span>
+      <span class="auth-ico">&#9889;</span>
       <div class="auth-title">DashVault Pro</div>
-      <div class="auth-sub">Secure File Management</div>
+      <div class="auth-sub">Admin Panel</div>
     </div>
     <div class="auth-div"></div>
     <label class="auth-lbl">Email</label>
-    <input class="auth-inp" id="a-em" type="email" placeholder="you@example.com"/>
+    <input class="auth-inp" id="a-em" type="email" placeholder="admin@example.com"/>
     <label class="auth-lbl">Password</label>
     <input class="auth-inp" id="a-pw" type="password" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;" onkeydown="if(event.key==='Enter')doLogin()"/>
     <button class="auth-btn" id="a-btn" onclick="doLogin()">Sign In &#8594;</button>
     <div class="auth-err" id="a-err"></div>
-    <div class="auth-foot"><a onclick="doReg()">Create account</a> &nbsp;&middot;&nbsp; <a onclick="showScreen('setup')">&#9881; Reconfigure</a></div>
+    <div class="auth-foot"><a onclick="doReg()">Create account</a></div>
   </div>
 </div>
 
@@ -369,55 +337,61 @@ html,body{background:var(--bg);color:var(--txt);font-family:"DM Sans",sans-serif
   <aside class="sidebar">
     <div class="sb-logo">&#9889; Dash<em>Vault</em></div>
     <button class="ni on" id="ni-files" onclick="showTab('files')"><span class="ico">&#128193;</span>My Files</button>
-    <button class="ni" id="ni-github" onclick="showTab('github')"><span class="ico">&#128025;</span>GitHub</button>
     <button class="ni" id="ni-settings" onclick="showTab('settings')"><span class="ico">&#9881;</span>Settings</button>
     <div class="sb-sep"></div>
     <div class="sb-foot">
-      <div class="user-pill"><div class="user-av" id="user-av">A</div><div><div class="user-nm" id="user-nm">Loading...</div><div class="user-rl">admin</div></div></div>
+      <div class="user-pill">
+        <div class="user-av" id="user-av">A</div>
+        <div><div class="user-nm" id="user-nm">Admin</div><div class="user-rl">admin</div></div>
+      </div>
       <button class="btn-out" onclick="doLogout()">&#8617; Sign Out</button>
     </div>
   </aside>
+
   <div class="main">
 
-    <!-- FILES -->
+    <!-- FILES TAB -->
     <div class="tab vis" id="tab-files">
-      <div class="ph"><div><div class="ph-title">My Files</div><div class="ph-sub">// upload &middot; protect &middot; share</div></div><button class="btn-new" onclick="openUpload()">&#43; Upload</button></div>
+      <div class="ph">
+        <div><div class="ph-title">My Files</div><div class="ph-sub">// upload &middot; protect &middot; share</div></div>
+        <button class="btn-new" onclick="openUpload()">&#43; Upload</button>
+      </div>
       <div class="stats">
         <div class="stat"><div class="stat-l">Total Files</div><div class="stat-n cg" id="st-t">0</div></div>
-        <div class="stat"><div class="stat-l">Active</div><div class="stat-n cgr" id="st-a">0</div></div>
+        <div class="stat"><div class="stat-l">Active Links</div><div class="stat-n cgr" id="st-a">0</div></div>
         <div class="stat"><div class="stat-l">Total Views</div><div class="stat-n cb" id="st-v">0</div></div>
-        <div class="stat"><div class="stat-l">Passwords</div><div class="stat-n cp" id="st-p">0</div></div>
+        <div class="stat"><div class="stat-l">Total Users</div><div class="stat-n cp" id="st-p">0</div></div>
       </div>
-      <div class="toolbar"><div class="srch"><span class="srch-ico">&#128269;</span><input class="srch-inp" id="srch" placeholder="Search files..." oninput="filterFiles()"/></div></div>
-      <div class="flist" id="flist"><div class="empty-s"><div class="empty-i">&#128194;</div><div class="empty-t">No files yet</div><div class="empty-d">Upload your first HTML file</div></div></div>
+      <div class="toolbar">
+        <div class="srch">
+          <span class="srch-ico">&#128269;</span>
+          <input class="srch-inp" id="srch" placeholder="Search files..." oninput="filterFiles()"/>
+        </div>
+      </div>
+      <div class="flist" id="flist">
+        <div class="empty-s"><div class="empty-i">&#128194;</div><div class="empty-t">No files yet</div><div class="empty-d">Upload your first HTML file</div></div>
+      </div>
     </div>
 
-    <!-- GITHUB -->
-    <div class="tab" id="tab-github">
-      <div class="ph"><div><div class="ph-title">GitHub Sync</div><div class="ph-sub">// push files to repository</div></div><button class="btn-new" onclick="loadGh()">&#8635; Refresh</button></div>
-      <div class="gc"><div class="gc-head">&#128279; Repository</div><div class="gh-rrow"><div><div class="gh-rn" id="gh-rn">&#8212;</div><div class="gh-ru" id="gh-ru">Configure in Settings</div></div><span class="sb active"><span class="sd"></span>connected</span></div></div>
-      <div class="gc"><div class="gc-head">&#128196; Files</div><div id="gh-list"><div style="color:var(--mute);font-size:12px;font-family:'DM Mono',monospace">Click Refresh to load</div></div></div>
-    </div>
-
-    <!-- SETTINGS -->
+    <!-- SETTINGS TAB -->
     <div class="tab" id="tab-settings">
-      <div class="ph"><div><div class="ph-title">Settings</div><div class="ph-sub">// update configuration</div></div><button class="btn-new" onclick="saveSettings()">&#128190; Save</button></div>
+      <div class="ph">
+        <div><div class="ph-title">Settings</div><div class="ph-sub">// app configuration</div></div>
+      </div>
       <div class="gc">
-        <div class="sg-s">&#128293; Firebase</div>
-        <div class="g2">
-          <div class="fg"><label class="lbl">API Key</label><input class="inp" id="ss-ak"/></div>
-          <div class="fg"><label class="lbl">Auth Domain</label><input class="inp" id="ss-ad"/></div>
-          <div class="fg"><label class="lbl">Project ID</label><input class="inp" id="ss-pid"/></div>
-          <div class="fg"><label class="lbl">App ID</label><input class="inp" id="ss-aid"/></div>
+        <div class="sg-s">&#128293; Firebase Config</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">
+          <div class="fg"><label class="lbl">Project ID</label><input class="inp" id="ss-pid" readonly/></div>
+          <div class="fg"><label class="lbl">Auth Domain</label><input class="inp" id="ss-ad" readonly/></div>
         </div>
-        <div class="sg-s">&#128025; GitHub</div>
-        <div class="g2">
-          <div class="fg" style="grid-column:1/-1"><label class="lbl">Personal Access Token</label><input class="inp" id="ss-gt" type="password"/></div>
-          <div class="fg"><label class="lbl">Username</label><input class="inp" id="ss-gu"/></div>
-          <div class="fg"><label class="lbl">Repository</label><input class="inp" id="ss-gr"/></div>
+        <div class="sg-s">&#128279; Share Link Base URL</div>
+        <div class="fg"><label class="lbl">App URL (GitHub Pages)</label>
+          <input class="inp" id="ss-url" placeholder="https://sunstarsolutions786.github.io/SunStar-Solutions-Management/index.html"/>
+          <div style="font-size:11px;color:var(--mute);margin-top:5px;font-family:'DM Mono',monospace">এই URL টি সঠিক না হলে Share Link কাজ করবে না।</div>
         </div>
-        <div class="sg-s">&#128279; App URL</div>
-        <div class="fg"><label class="lbl">GitHub Pages URL</label><input class="inp" id="ss-url" placeholder="https://username.github.io/dashvault/index.html"/></div>
+        <div style="margin-top:14px">
+          <button class="btn-new" onclick="saveSettings()" style="width:auto">&#128190; Save</button>
+        </div>
       </div>
     </div>
 
@@ -427,373 +401,463 @@ html,body{background:var(--bg);color:var(--txt);font-family:"DM Sans",sans-serif
 <!-- UPLOAD MODAL -->
 <div class="ov" id="up-ov">
   <div class="modal upm">
-    <div class="mhdr"><div class="mhdr-t">Upload HTML File</div><div class="mhdr-s">// stored directly in Firestore &middot; no storage needed</div></div>
+    <div class="mhdr">
+      <div class="mhdr-t">Upload HTML File</div>
+      <div class="mhdr-s">// max 2 MB &middot; stored securely in Firestore</div>
+    </div>
     <div class="mbody">
       <div class="dz" id="dz">
         <input type="file" id="file-inp" accept=".html,.htm" multiple onchange="handleFiles(this.files)"/>
         <div class="dz-ico">&#128193;</div>
         <div class="dz-t">Drop files here or click to browse</div>
-        <div class="dz-s">.html / .htm &middot; max 900 KB per file</div>
+        <div class="dz-s">.html / .htm only</div>
       </div>
       <div class="sel-f" id="sel-f"></div>
-      <div class="size-warn" id="size-warn">&#9888; Some files exceed 900 KB limit and will be skipped.</div>
+      <div class="size-warn" id="size-warn">&#9888; Some files exceed 2 MB and will be skipped.</div>
+      <div class="prog" id="prog"><div class="prog-f" id="prog-f"></div></div>
     </div>
-    <div class="mfoot"><button class="btn-sec" onclick="closeUp()">Cancel</button><button class="btn-primary" id="up-btn" style="flex:1;margin-top:0" onclick="doUpload()" disabled>Upload</button></div>
+    <div class="mfoot">
+      <button class="btn-sec" onclick="closeUp()">Cancel</button>
+      <button class="btn-primary" id="up-btn" style="flex:1;margin-top:0" onclick="doUpload()" disabled>Upload</button>
+    </div>
   </div>
 </div>
 
-<!-- PASSWORD MODAL -->
+<!-- USER MANAGEMENT MODAL -->
 <div class="ov" id="pw-ov">
   <div class="modal pwm">
-    <div class="mhdr"><div class="mhdr-t">&#128272; Manage Passwords</div><div class="pw-ftag" id="pw-ftag">&#128196; file.html</div></div>
-    <div class="mbody">
-      <div class="pwibox">Each password works <strong>independently</strong>. Different clients get different passwords. <strong>5 wrong attempts</strong> &#8594; session locked.</div>
-      <div class="div-line"><span>Add New</span></div>
-      <div class="pw-add">
-        <div class="fg"><label class="lbl">Client Label</label><input class="inp" id="pw-lbl-inp" placeholder="e.g. Client Rafi"/></div>
-        <div class="fg fg2"><label class="lbl">Password</label>
-          <div class="irel"><input class="inp" id="pw-val-inp" type="password" placeholder="Enter password" onkeydown="if(event.key==='Enter')addPw()"/><button class="eye" onclick="toggleEye('pw-val-inp',this)">&#128065;</button></div>
-        </div>
-        <button class="btn-add" onclick="addPw()">&#43; Add</button>
-      </div>
-      <div class="div-line"><span>Active Passwords</span></div>
-      <div class="pw-list" id="pw-list"></div>
+    <div class="mhdr">
+      <div class="mhdr-t">&#128272; Manage Access Users</div>
+      <div class="mhdr-s" id="pw-fname"></div>
     </div>
-    <div class="mfoot"><button class="btn-sec" onclick="closePw()">Close</button></div>
+    <div class="mbody">
+      <div class="pw-info">
+        প্রতিটি user এর <strong>User ID + Password + Expiry</strong> আলাদা।
+        Client শুধু User ID ও Password দিয়ে login করবে।
+        <strong>৫ বার ভুল</strong> &#8594; session locked।
+      </div>
+      <div class="div-line"><span>Add New User</span></div>
+      <div class="add-grid">
+        <div class="fg"><label class="lbl">User ID</label><input class="inp" id="pw-uid" placeholder="e.g. rafi_2024"/></div>
+        <div class="fg"><label class="lbl">Password</label>
+          <div class="irel"><input class="inp" id="pw-val" type="password" placeholder="Password" onkeydown="if(event.key==='Enter')addUser()"/>
+          <button class="eye" onclick="tEye('pw-val',this)">&#128065;</button></div>
+        </div>
+        <div class="fg"><label class="lbl">Expiry (Optional)</label>
+          <input class="inp" id="pw-exp" type="date" style="font-family:'DM Mono',monospace;font-size:12px;cursor:pointer"/>
+        </div>
+        <button class="btn-add" onclick="addUser()">&#43; Add</button>
+      </div>
+      <div class="div-line"><span>Users (<span id="user-count-lbl">0</span>)</span></div>
+      <div class="user-list" id="user-list"></div>
+    </div>
+    <div class="mfoot"><button class="btn-sec" style="max-width:120px" onclick="closePw()">Close</button></div>
   </div>
 </div>
 
 <!-- TOAST -->
 <div id="toast"><span id="t-ico">&#10003;</span><span id="t-msg"></span></div>
 
-<!-- Firebase (Auth + Firestore only, NO Storage) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.4.4/lz-string.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-
 <script>
-/* ── HARDCODED CONFIG ── */
-var CFG = {
-  firebase: {
-    apiKey:            "AIzaSyB6ulPU4jQHUveHJdxftg2I7RJpiikfNcc",
-    authDomain:        "sunstar-solutions-management.firebaseapp.com",
-    projectId:         "sunstar-solutions-management",
-    appId:             "1:1071421009981:web:2e9b0986c7f32991953a54"
+var CFG={
+  firebase:{
+    apiKey:"AIzaSyB6ulPU4jQHUveHJdxftg2I7RJpiikfNcc",
+    authDomain:"sunstar-solutions-management.firebaseapp.com",
+    projectId:"sunstar-solutions-management",
+    appId:"1:1071421009981:web:2e9b0986c7f32991953a54"
   },
-  github: { token: '', user: '', repo: '' },
-  appUrl: 'https://sunstarsolutions786.github.io/SunStar-Solutions-Management/index.html'
+  appUrl:"https://sunstarsolutions786.github.io/SunStar-Solutions-Management/index.html"
 };
 
-var auth,db;
-var allFiles=[],filesToUp=[];
-var activePwId=null,cvData=null,cvAtt=0,MAX_ATT=5,_t;
+var auth,db,allFiles=[],filesToUp=[],activePwDocId=null,cvData=null,_t;
 
+/* ═══════════════════════════════════════════════════════════════
+   CRYPTO — AES-256-GCM + PBKDF2
+   Console থেকে bypass অসম্ভব: password ছাড়া decrypt হবেই না
+   ═══════════════════════════════════════════════════════════════ */
+function _b64(arr){return btoa(String.fromCharCode(...new Uint8Array(arr)));}
+function _arr(b64){return Uint8Array.from(atob(b64),function(c){return c.charCodeAt(0);});}
+
+// Password থেকে AES-256 key বানাও (PBKDF2, 100k iterations)
+async function deriveKey(password,salt){
+  var km=await crypto.subtle.importKey("raw",new TextEncoder().encode(password),"PBKDF2",false,["deriveKey"]);
+  return crypto.subtle.deriveKey(
+    {name:"PBKDF2",salt:new TextEncoder().encode(salt),iterations:100000,hash:"SHA-256"},
+    km,{name:"AES-GCM",length:256},true,["encrypt","decrypt"]
+  );
+}
+// AES-256-GCM encrypt → {iv, data} base64
+async function aesEnc(key,text){
+  var iv=crypto.getRandomValues(new Uint8Array(12));
+  var enc=await crypto.subtle.encrypt({name:"AES-GCM",iv:iv},key,new TextEncoder().encode(text));
+  return{iv:_b64(iv),data:_b64(enc)};
+}
+// AES-256-GCM decrypt — wrong password হলে এখানেই error throw করে
+async function aesDec(key,ivB64,dataB64){
+  var dec=await crypto.subtle.decrypt({name:"AES-GCM",iv:_arr(ivB64)},key,_arr(dataB64));
+  return new TextDecoder().decode(dec);
+}
+async function exportKey(k){return _b64(await crypto.subtle.exportKey("raw",k));}
+async function importKey(b64){
+  return crypto.subtle.importKey("raw",_arr(b64),{name:"AES-GCM"},true,["encrypt","decrypt"]);
+}
+// Admin-এর UID দিয়ে masterKey seal করো (auto-unseals যখন admin logged in)
+async function sealMK(masterKey,uid){
+  var ak=await deriveKey(uid,"dashvault-admin-v1");
+  return aesEnc(ak,await exportKey(masterKey));
+}
+async function unsealMK(seal,uid){
+  var ak=await deriveKey(uid,"dashvault-admin-v1");
+  return importKey(await aesDec(ak,seal.iv,seal.data));
+}
+// User password দিয়ে masterKey wrap করো
+async function wrapMK(masterKey,password,salt){
+  var uk=await deriveKey(password,salt);
+  return aesEnc(uk,await exportKey(masterKey));
+}
+async function unwrapMK(wrap,password,salt){
+  var uk=await deriveKey(password,salt);
+  return importKey(await aesDec(uk,wrap.iv,wrap.data));
+}
+// Random salt
+function rSalt(){return _b64(crypto.getRandomValues(new Uint8Array(16)));}
+// Admin SHA-256 (Firebase Auth password-এর জন্য — অপরিবর্তিত)
 async function sha256(s){
-  var b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));
-  return Array.from(new Uint8Array(b)).map(function(x){return x.toString(16).padStart(2,'0');}).join('');
+  var b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(s));
+  return Array.from(new Uint8Array(b)).map(function(x){return x.toString(16).padStart(2,"0");}).join("");
 }
 function uid4(){return Math.random().toString(36).slice(2,10);}
 
-/* BOOT — setup screen skip করা হয়েছে */
-window.addEventListener('DOMContentLoaded',function(){
-  var vid=new URLSearchParams(location.search).get('view');
-  if(vid){showScreen('cv');cvStart(vid);return;}
+/* BOOT */
+window.addEventListener("DOMContentLoaded",function(){
+  var vid=new URLSearchParams(location.search).get("view");
+  if(vid){showScreen("cv");cvStart(vid);return;}
   initFB();
 });
 
-/* SCREENS */
-function showScreen(id){document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('vis');});document.getElementById(id).classList.add('vis');}
+function showScreen(id){document.querySelectorAll(".screen").forEach(function(s){s.classList.remove("vis");});document.getElementById(id).classList.add("vis");}
 function showTab(t){
-  ['files','github','settings'].forEach(function(x){
-    document.getElementById('tab-'+x).classList.toggle('vis',x===t);
-    document.getElementById('ni-'+x).classList.toggle('on',x===t);
+  ["files","settings"].forEach(function(x){
+    document.getElementById("tab-"+x).classList.toggle("vis",x===t);
+    document.getElementById("ni-"+x).classList.toggle("on",x===t);
   });
-  if(t==='github')loadGh();
 }
-
-/* SETUP — disabled (config hardcoded) */
-function saveSetup(){}
-function showErr(id,msg){}
 
 /* FIREBASE */
 function initFB(){
   try{
-    var app=firebase.apps.length?firebase.apps[0]:firebase.initializeApp(CFG.firebase);
+    if(!firebase.apps.length)firebase.initializeApp(CFG.firebase);
     auth=firebase.auth();db=firebase.firestore();
-    auth.onAuthStateChanged(function(u){if(u)showApp(u);else showScreen('auth');});
+    auth.onAuthStateChanged(function(u){if(u)showApp(u);else showScreen("auth");});
   }catch(e){
-    document.body.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:DM Sans,sans-serif;color:#ff4d6a;font-size:14px;text-align:center;padding:20px">Firebase Error: '+e.message+'</div>';
+    document.body.innerHTML='<div style="display:flex;height:100vh;align-items:center;justify-content:center;color:#ff4d6a;font-family:sans-serif;text-align:center;padding:20px">Firebase Error: '+e.message+"</div>";
   }
 }
 
 /* AUTH */
 async function doLogin(){
-  var btn=document.getElementById('a-btn'),err=document.getElementById('a-err');
-  err.classList.remove('vis');btn.disabled=true;btn.innerHTML='<div class="spn"></div>';
-  try{await auth.signInWithEmailAndPassword(g('a-em'),g('a-pw'));}
-  catch(e){err.textContent=e.message;err.classList.add('vis');btn.disabled=false;btn.innerHTML='Sign In &#8594;';}
+  var btn=document.getElementById("a-btn"),err=document.getElementById("a-err");
+  err.classList.remove("vis");btn.disabled=true;btn.innerHTML='<div class="spn"></div>';
+  try{await auth.signInWithEmailAndPassword(g("a-em"),g("a-pw"));}
+  catch(e){err.textContent=e.message;err.classList.add("vis");btn.disabled=false;btn.innerHTML="Sign In &#8594;";}
 }
 async function doReg(){
-  var em=prompt('Email for new account:');if(!em)return;
-  var pw=prompt('Password (min 6 chars):');if(!pw)return;
-  try{await auth.createUserWithEmailAndPassword(em,pw);toast('Account created!','ok');}
-  catch(e){toast(e.message,'err');}
+  var em=prompt("Email for new admin account:");if(!em)return;
+  var pw=prompt("Password (min 6 chars):");if(!pw)return;
+  try{await auth.createUserWithEmailAndPassword(em,pw);toast("Account created!","ok");}
+  catch(e){toast(e.message,"err");}
 }
-async function doLogout(){await auth.signOut();showScreen('auth');}
+async function doLogout(){await auth.signOut();showScreen("auth");}
 
 /* APP */
 function showApp(u){
-  showScreen('app');
-  var em=u.email||'';
-  document.getElementById('user-nm').textContent=em;
-  document.getElementById('user-av').textContent=(em[0]||'A').toUpperCase();
-  updateGhDisplay();loadSettingsUI();loadFiles();
+  showScreen("app");
+  var em=u.email||"";
+  document.getElementById("user-nm").textContent=em.split("@")[0]||"Admin";
+  document.getElementById("user-av").textContent=(em[0]||"A").toUpperCase();
+  loadSettingsUI();loadFiles();
 }
 
-/* LOAD FILES */
+/* FILES */
 async function loadFiles(){
   try{
     var uid=auth.currentUser.uid;
-    var snap=await db.collection('links').where('uid','==',uid).orderBy('createdAt','desc').get();
+    var snap=await db.collection("links").where("uid","==",uid).orderBy("createdAt","desc").get();
     allFiles=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
     renderFiles(allFiles);updateStats();
-  }catch(e){toast('Load error: '+e.message,'err');}
+  }catch(e){toast("Load error: "+e.message,"err");}
 }
 
 function renderFiles(files){
-  var el=document.getElementById('flist');
-  if(!files.length){el.innerHTML='<div class="empty-s"><div class="empty-i">&#128194;</div><div class="empty-t">No files yet</div><div class="empty-d">Upload your first HTML file</div></div>';return;}
+  var el=document.getElementById("flist");
+  if(!files.length){
+    el.innerHTML='<div class="empty-s"><div class="empty-i">&#128194;</div><div class="empty-t">No files yet</div><div class="empty-d">Upload your first HTML file</div></div>';
+    return;
+  }
   el.innerHTML=files.map(function(f){
-    var st=getStatus(f);
-    var pws=f.passwords||[],pwA=pws.filter(function(p){return p.active;}).length;
-    var expVal=f.expiresAt?new Date(f.expiresAt.seconds*1000).toISOString().split('T')[0]:'';
-    var sUrl=getShareUrl(f.id);
-    return '<div class="fcard">'+
-      '<div class="fc-top">'+
-        '<div class="fc-name"><div class="fc-ico">&#128196;</div>'+
-          '<div><div class="fc-t">'+esc(f.name)+'</div>'+
-          '<div class="fc-m">'+formatSize(f.size||0)+' &middot; '+formatDate(f.createdAt)+'</div></div>'+
-        '</div>'+
-        '<div class="fc-col"><div class="fc-col-l">Status</div><span class="sb '+st.cls+'"><span class="sd"></span>'+st.label+'</span></div>'+
-        '<div class="fc-col"><div class="fc-col-l">Active</div><label class="tog"><input type="checkbox" '+(f.active?'checked':'')+' onchange="toggleActive(\''+f.id+'\',this.checked)"/><div class="tog-t"></div></label></div>'+
-        '<div class="fc-col"><div class="fc-col-l">Views</div><div class="vn">'+(f.views||0)+'</div></div>'+
-        '<div class="fc-col"><div class="fc-col-l">Expiry</div>'+
-          '<div class="exp-row"><input type="date" class="exp-in" id="exp-'+f.id+'" value="'+expVal+'" min="'+todayStr()+'"/>'+
-          '<button class="bxs set" onclick="saveExp(\''+f.id+'\')">Set</button>'+
-          (expVal?'<button class="bxs clr" onclick="clearExp(\''+f.id+'\')">&#10005;</button>':'')+
-          '</div>'+
-        '</div>'+
-      '</div>'+
-      '<div style="padding:0 16px 12px;display:flex;gap:6px;flex-wrap:wrap;border-top:1px solid var(--b);padding-top:11px;margin-top:2px">'+
-        '<button class="abt pw-b" onclick="openPw(\''+f.id+'\',\''+esc(f.name)+'\')">&#128272; '+pwA+' / '+pws.length+' Passwords</button>'+
-        '<button class="abt copy" onclick="copyLink(\''+sUrl+'\')">&#128279; Copy Link</button>'+
-        '<button class="abt gh" onclick="syncGh(\''+f.id+'\')">&#128025; GitHub</button>'+
-        '<button class="abt del" onclick="delFile(\''+f.id+'\',\''+esc(f.name)+'\')">&#128465; Delete</button>'+
-      '</div>'+
-    '</div>';
-  }).join('');
+    var users=f.passwords||[];
+    var uA=users.filter(function(u){
+      if(!u.active)return false;
+      if(u.expiresAt){var d=u.expiresAt.seconds?new Date(u.expiresAt.seconds*1000):new Date(u.expiresAt);if(d<new Date())return false;}
+      return true;
+    }).length;
+    return "<div class=\"fcard\">"+
+      "<div class=\"fc-top\">"+
+        "<div class=\"fc-name\"><div class=\"fc-ico\">&#128196;</div>"+
+          "<div><div class=\"fc-t\">"+esc(f.name)+"</div>"+
+          "<div class=\"fc-m\">"+formatSize(f.size||0)+" &middot; "+formatDate(f.createdAt)+"</div></div>"+
+        "</div>"+
+        "<div class=\"fc-right\">"+
+          "<span class=\"sb "+(f.active?"active":"inactive")+"\"><span class=\"sd\"></span>"+(f.active?"Active":"Inactive")+"</span>"+
+          "<label class=\"tog\"><input type=\"checkbox\" "+(f.active?"checked":"")+" onchange=\"toggleActive('"+f.id+"',this.checked)\"/><div class=\"tog-t\"></div></label>"+
+          "<span class=\"user-count\">&#128272; "+uA+"/"+users.length+"</span>"+
+        "</div>"+
+      "</div>"+
+      "<div class=\"fc-actions\">"+
+        "<button class=\"abt pw-b\" onclick=\"openPw('"+f.id+"','"+esc(f.name)+"')\">&#128272; Manage Users</button>"+
+        "<button class=\"abt copy\" onclick=\"copyLink('"+getShareUrl(f.id)+"')\">&#128279; Copy Link</button>"+
+        "<button class=\"abt del\" onclick=\"delFile('"+f.id+"','"+esc(f.name)+"')\">&#128465; Delete</button>"+
+      "</div>"+
+    "</div>";
+  }).join("");
 }
 
-function getStatus(f){
-  if(!f.active)return{cls:'inactive',label:'Inactive'};
-  if(f.expiresAt&&new Date(f.expiresAt.seconds*1000)<new Date())return{cls:'expired',label:'Expired'};
-  return{cls:'active',label:'Active'};
-}
-function filterFiles(){var q=g('srch').toLowerCase();renderFiles(allFiles.filter(function(f){return f.name.toLowerCase().includes(q);}));}
+function filterFiles(){var q=g("srch").toLowerCase();renderFiles(allFiles.filter(function(f){return f.name.toLowerCase().includes(q);}));}
 function updateStats(){
-  var now=new Date();
-  var a=allFiles.filter(function(f){return f.active&&(!f.expiresAt||new Date(f.expiresAt.seconds*1000)>now);}).length;
+  var a=allFiles.filter(function(f){return f.active;}).length;
   var v=allFiles.reduce(function(s,f){return s+(f.views||0);},0);
-  var p=allFiles.reduce(function(s,f){return s+((f.passwords||[]).filter(function(x){return x.active;}).length);},0);
-  sv('st-t',allFiles.length);sv('st-a',a);sv('st-v',v);sv('st-p',p);
+  var p=allFiles.reduce(function(s,f){return s+((f.passwords||[]).filter(function(u){return u.active;}).length);},0);
+  svn("st-t",allFiles.length);svn("st-a",a);svn("st-v",v);svn("st-p",p);
 }
 
-/* ACTIVE / EXPIRY / DELETE */
 async function toggleActive(id,val){
-  try{await db.collection('links').doc(id).update({active:val});var f=find(id);if(f)f.active=val;renderFiles(allFiles);updateStats();toast(val?'Activated':'Deactivated',val?'ok':'info');}
-  catch(e){toast(e.message,'err');}
+  try{await db.collection("links").doc(id).update({active:val});var f=find(id);if(f)f.active=val;renderFiles(allFiles);updateStats();toast(val?"Link activated":"Link deactivated",val?"ok":"info");}
+  catch(e){toast(e.message,"err");}
 }
-async function saveExp(id){
-  var val=document.getElementById('exp-'+id).value;
-  try{
-    var ts=val?firebase.firestore.Timestamp.fromDate(new Date(val+'T23:59:59')):null;
-    await db.collection('links').doc(id).update({expiresAt:ts});
-    var f=find(id);if(f)f.expiresAt=ts;renderFiles(allFiles);updateStats();
-    toast(val?'Expiry: '+val:'Expiry cleared','ok');
-  }catch(e){toast(e.message,'err');}
-}
-async function clearExp(id){document.getElementById('exp-'+id).value='';await saveExp(id);}
 async function delFile(id,name){
-  if(!confirm('Delete "'+name+'"? All access will be revoked.'))return;
-  try{await db.collection('links').doc(id).delete();allFiles=allFiles.filter(function(f){return f.id!==id;});renderFiles(allFiles);updateStats();toast('"'+name+'" deleted','ok');}
-  catch(e){toast(e.message,'err');}
+  if(!confirm("Delete \""+name+"\"? All user access will be revoked."))return;
+  try{await db.collection("links").doc(id).delete();allFiles=allFiles.filter(function(f){return f.id!==id;});renderFiles(allFiles);updateStats();toast("\""+name+"\" deleted","ok");}
+  catch(e){toast(e.message,"err");}
 }
-function copyLink(url){navigator.clipboard.writeText(url).then(function(){toast('Link copied!','ok');});}
+function copyLink(url){navigator.clipboard.writeText(url).then(function(){toast("Link copied! &#128203;","ok");});}
 function getShareUrl(id){
-  var base=CFG&&CFG.appUrl&&CFG.appUrl.trim()?CFG.appUrl.trim():location.origin+location.pathname;
-  return base.replace(/[?#].*$/,'')+'?view='+id;
+  var base=CFG.appUrl&&CFG.appUrl.trim()?CFG.appUrl.trim():location.origin+location.pathname;
+  return base.replace(/[?#].*$/,"")+"?view="+id;
 }
 
-/* UPLOAD — stores content in Firestore */
+/* UPLOAD */
 function openUpload(){
   filesToUp=[];
-  document.getElementById('sel-f').textContent='';
-  document.getElementById('up-btn').disabled=true;
-  document.getElementById('size-warn').style.display='none';
-  document.getElementById('up-ov').classList.add('vis');
+  document.getElementById("sel-f").textContent="";
+  document.getElementById("up-btn").disabled=true;
+  document.getElementById("size-warn").style.display="none";
+  document.getElementById("prog").style.display="none";
+  document.getElementById("prog-f").style.width="0";
+  document.getElementById("up-ov").classList.add("vis");
 }
-function closeUp(){document.getElementById('up-ov').classList.remove('vis');}
-
+function closeUp(){document.getElementById("up-ov").classList.remove("vis");}
 function handleFiles(files){
-  var MAX=900*1024;
-  var valid=[],warn=false;
+  var MAX=2*1024*1024,valid=[],warn=false;
   Array.from(files).forEach(function(f){
     if(!/\.html?$/i.test(f.name))return;
     if(f.size>MAX){warn=true;return;}
     valid.push(f);
   });
   filesToUp=valid;
-  document.getElementById('sel-f').textContent=valid.map(function(f){return '+ '+f.name+' ('+formatSize(f.size)+')';}).join('\n');
-  document.getElementById('size-warn').style.display=warn?'block':'none';
-  document.getElementById('up-btn').disabled=!valid.length;
+  document.getElementById("sel-f").textContent=valid.map(function(f){return "+ "+f.name+" ("+formatSize(f.size)+")";}).join("\n");
+  document.getElementById("size-warn").style.display=warn?"block":"none";
+  document.getElementById("up-btn").disabled=!valid.length;
 }
-
 async function doUpload(){
   if(!filesToUp.length)return;
-  var uid=auth.currentUser.uid,btn=document.getElementById('up-btn');
-  btn.disabled=true;btn.textContent='Uploading...';
+  var uid=auth.currentUser.uid,btn=document.getElementById("up-btn"),pf=document.getElementById("prog-f");
+  btn.disabled=true;btn.textContent="Encrypting & Uploading...";
+  document.getElementById("prog").style.display="block";
   for(var i=0;i<filesToUp.length;i++){
     var file=filesToUp[i];
-    var content=await readFileText(file);
-    await db.collection('links').add({
-      uid:uid,name:file.name,content:content,
-      active:true,expiresAt:null,passwords:[],
+    var raw=await readFileText(file);
+    var comp=LZString.compressToBase64(raw);
+
+    // ── AES-256-GCM encryption ──────────────────────────────────────────
+    var masterKey=await crypto.subtle.generateKey({name:"AES-GCM",length:256},true,["encrypt","decrypt"]);
+    var encContent=await aesEnc(masterKey,comp);      // content encrypt
+    var seal=await sealMK(masterKey,uid);             // admin-এর জন্য masterKey seal
+
+    await db.collection("links").add({
+      uid:uid,name:file.name,
+      encryptedContent:encContent,   // ← encrypted blob, console-এ garbage দেখাবে
+      masterKeySeal:seal,            // ← admin-only seal
+      active:true,passwords:[],
       createdAt:firebase.firestore.FieldValue.serverTimestamp(),
       views:0,size:file.size
     });
+    pf.style.width=((i+1)/filesToUp.length*100)+"%";
   }
-  closeUp();toast(filesToUp.length+' file(s) uploaded!','ok');btn.textContent='Upload';loadFiles();
+  closeUp();toast(filesToUp.length+" file(s) encrypted & uploaded!","ok");btn.textContent="Upload";loadFiles();
 }
-function readFileText(file){
-  return new Promise(function(res,rej){
-    var r=new FileReader();
-    r.onload=function(e){res(e.target.result);};
-    r.onerror=rej;
-    r.readAsText(file,'UTF-8');
-  });
-}
-var dz=document.getElementById('dz');
-dz.addEventListener('dragover',function(e){e.preventDefault();dz.classList.add('ov2');});
-dz.addEventListener('dragleave',function(){dz.classList.remove('ov2');});
-dz.addEventListener('drop',function(e){e.preventDefault();dz.classList.remove('ov2');handleFiles(e.dataTransfer.files);});
+function readFileText(file){return new Promise(function(res,rej){var r=new FileReader();r.onload=function(e){res(e.target.result);};r.onerror=rej;r.readAsText(file,"UTF-8");});}
+var dz=document.getElementById("dz");
+dz.addEventListener("dragover",function(e){e.preventDefault();dz.classList.add("ov2");});
+dz.addEventListener("dragleave",function(){dz.classList.remove("ov2");});
+dz.addEventListener("drop",function(e){e.preventDefault();dz.classList.remove("ov2");handleFiles(e.dataTransfer.files);});
 
-/* PASSWORD MANAGEMENT */
+/* USER MANAGEMENT */
 function openPw(id,name){
-  activePwId=id;
-  document.getElementById('pw-ftag').innerHTML='&#128196; '+esc(name);
-  document.getElementById('pw-lbl-inp').value='';
-  document.getElementById('pw-val-inp').value='';
-  renderPwList();
-  document.getElementById('pw-ov').classList.add('vis');
+  activePwDocId=id;
+  document.getElementById("pw-fname").textContent=name;
+  document.getElementById("pw-uid").value="";
+  document.getElementById("pw-val").value="";
+  document.getElementById("pw-exp").value="";
+  renderUserList();
+  document.getElementById("pw-ov").classList.add("vis");
 }
-function closePw(){document.getElementById('pw-ov').classList.remove('vis');activePwId=null;}
-function renderPwList(){
-  if(!activePwId)return;
-  var f=find(activePwId);if(!f)return;
-  var pws=f.passwords||[];
-  var el=document.getElementById('pw-list');
-  if(!pws.length){el.innerHTML='';return;}
-  el.innerHTML=pws.map(function(p){
-    return '<div class="pwi'+(p.active?'':' off')+'" id="pwi-'+p.id+'">'+
-      '<div><div class="pwi-label">'+esc(p.label||'Unnamed')+'</div><div class="pwi-views">Views: <em>'+(p.views||0)+'</em></div></div>'+
-      '<label class="tog"><input type="checkbox" '+(p.active?'checked':'')+' onchange="togglePw(\''+p.id+'\',this.checked)"/><div class="tog-t"></div></label>'+
-      '<button class="pw-del" onclick="delPw(\''+p.id+'\')">&#128465;</button>'+
-    '</div>';
-  }).join('');
+function closePw(){document.getElementById("pw-ov").classList.remove("vis");activePwDocId=null;}
+
+function expStatus(u){
+  if(!u.expiresAt)return null;
+  var d=u.expiresAt.seconds?new Date(u.expiresAt.seconds*1000):new Date(u.expiresAt);
+  var diff=d-new Date();
+  if(diff<0)return"expired";
+  if(diff<3*86400000)return"soon";
+  return"ok";
 }
-async function addPw(){
-  var label=g('pw-lbl-inp'),val=document.getElementById('pw-val-inp').value;
-  if(!label){toast('Client label required','err');return;}
-  if(!val||val.length<3){toast('Password too short (min 3)','err');return;}
-  if(!activePwId)return;
-  try{
-    var hash=await sha256(val);
-    var np={id:uid4(),label:label,hash:hash,active:true,views:0,createdAt:Date.now()};
-    var f=find(activePwId);if(!f)return;
-    var pws=(f.passwords||[]).concat([np]);
-    await db.collection('links').doc(activePwId).update({passwords:pws});
-    f.passwords=pws;
-    document.getElementById('pw-lbl-inp').value='';
-    document.getElementById('pw-val-inp').value='';
-    renderPwList();renderFiles(allFiles);updateStats();
-    toast('"'+label+'" password added','ok');
-  }catch(e){toast(e.message,'err');}
-}
-async function togglePw(pwId,val){
-  if(!activePwId)return;
-  var f=find(activePwId);if(!f)return;
-  var pws=(f.passwords||[]).map(function(p){return p.id===pwId?Object.assign({},p,{active:val}):p;});
-  try{await db.collection('links').doc(activePwId).update({passwords:pws});f.passwords=pws;renderPwList();renderFiles(allFiles);updateStats();toast(val?'Enabled':'Disabled',val?'ok':'info');}
-  catch(e){toast(e.message,'err');}
-}
-async function delPw(pwId){
-  if(!activePwId)return;
-  var f=find(activePwId);if(!f)return;
-  if(!confirm('Remove this password?'))return;
-  var pws=(f.passwords||[]).filter(function(p){return p.id!==pwId;});
-  try{await db.collection('links').doc(activePwId).update({passwords:pws});f.passwords=pws;renderPwList();renderFiles(allFiles);updateStats();toast('Password removed','ok');}
-  catch(e){toast(e.message,'err');}
+function expText(u){
+  if(!u.expiresAt)return"No expiry";
+  var d=u.expiresAt.seconds?new Date(u.expiresAt.seconds*1000):new Date(u.expiresAt);
+  return"Expires "+d.toLocaleDateString("en-US",{day:"numeric",month:"short",year:"2-digit"});
 }
 
-/* GITHUB */
-async function syncGh(id){
-  var gh=(CFG&&CFG.github)||{};
-  if(!gh.token||!gh.user||!gh.repo){toast('GitHub not configured','err');return;}
-  var f=find(id);if(!f||!f.content){toast('File content not found','err');return;}
-  toast('Syncing...','info');
+function renderUserList(){
+  if(!activePwDocId)return;
+  var f=find(activePwDocId);if(!f)return;
+  var users=f.passwords||[];
+  document.getElementById("user-count-lbl").textContent=users.length;
+  var el=document.getElementById("user-list");
+  if(!users.length){el.innerHTML="";return;}
+  el.innerHTML=users.map(function(u){
+    var es=expStatus(u);
+    var ec=es==="expired"?"red":es==="soon"?"orange":"";
+    var eVal=u.expiresAt?(u.expiresAt.seconds?new Date(u.expiresAt.seconds*1000):new Date(u.expiresAt)).toISOString().split("T")[0]:"";
+    return "<div class=\"ui"+(u.active?"":" off")+"\" id=\"ui-"+u.id+"\">"+
+      "<div class=\"ui-top\">"+
+        "<div>"+
+          "<div class=\"ui-id\">"+esc(u.userId)+"</div>"+
+          "<div class=\"ui-meta\">Views: <em>"+(u.views||0)+"</em><span class=\"ui-exp-txt "+ec+"\">"+expText(u)+(es==="expired"?" &#9888;":"")+"</span></div>"+
+        "</div>"+
+        "<label class=\"tog\"><input type=\"checkbox\" "+(u.active?"checked":"")+" onchange=\"toggleUser('"+u.id+"',this.checked)\"/><div class=\"tog-t\"></div></label>"+
+        "<button class=\"bxs edit\" onclick=\"toggleEdit('"+u.id+"')\">&#9998;</button>"+
+        "<button class=\"bxs del\" onclick=\"delUser('"+u.id+"')\">&#128465;</button>"+
+      "</div>"+
+      "<div class=\"ui-edit-panel\" id=\"ep-"+u.id+"\">"+
+        "<div class=\"edit-grid\">"+
+          "<div class=\"fg\"><label class=\"lbl\">New Password</label>"+
+            "<div class=\"irel\"><input class=\"inp\" id=\"epw-"+u.id+"\" type=\"password\" placeholder=\"Leave blank to keep\"/>"+
+            "<button class=\"eye\" onclick=\"tEye('epw-"+u.id+"',this)\">&#128065;</button></div></div>"+
+          "<div class=\"fg\"><label class=\"lbl\">Expiry Date</label>"+
+            "<input class=\"inp\" id=\"eexp-"+u.id+"\" type=\"date\" value=\""+eVal+"\" style=\"font-family:'DM Mono',monospace;font-size:12px;cursor:pointer\"/>"+
+          "</div>"+
+        "</div>"+
+        "<div class=\"edit-btns\">"+
+          "<button class=\"bxs save\" onclick=\"saveEdit('"+u.id+"')\">&#128190; Save</button>"+
+          "<button class=\"bxs\" onclick=\"toggleEdit('"+u.id+"')\">Cancel</button>"+
+        "</div>"+
+      "</div>"+
+    "</div>";
+  }).join("");
+}
+
+async function addUser(){
+  var userId=g("pw-uid"),val=document.getElementById("pw-val").value,expVal=g("pw-exp");
+  if(!userId){toast("User ID required","err");return;}
+  if(!val||val.length<3){toast("Password min 3 chars","err");return;}
+  if(!activePwDocId)return;
+  var f=find(activePwDocId);if(!f)return;
+  if((f.passwords||[]).find(function(u){return u.userId===userId;})){toast("User ID already exists","err");return;}
   try{
-    var b64=btoa(unescape(encodeURIComponent(f.content)));
-    var sha,chk=await fetch('https://api.github.com/repos/'+gh.user+'/'+gh.repo+'/contents/dashboards/'+f.name,{headers:{Authorization:'token '+gh.token}});
-    if(chk.ok)sha=(await chk.json()).sha;
-    var body={message:'Update '+f.name,content:b64};if(sha)body.sha=sha;
-    var put=await fetch('https://api.github.com/repos/'+gh.user+'/'+gh.repo+'/contents/dashboards/'+f.name,{method:'PUT',headers:{Authorization:'token '+gh.token,'Content-Type':'application/json'},body:JSON.stringify(body)});
-    if(put.ok)toast('"'+f.name+'" synced to GitHub','ok');
-    else{var j=await put.json();toast('GitHub: '+j.message,'err');}
-  }catch(e){toast('Sync failed','err');}
+    // masterKey unseal করো (admin logged in আছে, তাই auto-unlock)
+    var masterKey=await unsealMK(f.masterKeySeal,auth.currentUser.uid);
+
+    // user-এর password দিয়ে masterKey wrap করো
+    var salt=rSalt();
+    var wrappedMK=await wrapMK(masterKey,val,salt);
+    var expTs=expVal?new Date(expVal+"T23:59:59").getTime():null;
+
+    var nu={
+      id:uid4(),userId:userId,
+      salt:salt,
+      wrappedMasterKey:wrappedMK,  // ← encrypted masterKey for this user
+      active:true,expiresAt:expTs,views:0,createdAt:Date.now()
+    };
+    var pws=(f.passwords||[]).concat([nu]);
+    await db.collection("links").doc(activePwDocId).update({passwords:pws});
+    f.passwords=pws;
+    document.getElementById("pw-uid").value="";
+    document.getElementById("pw-val").value="";
+    document.getElementById("pw-exp").value="";
+    renderUserList();renderFiles(allFiles);updateStats();
+    toast("\""+userId+"\" added","ok");
+  }catch(e){toast("Error: "+e.message,"err");}
 }
-async function loadGh(){
-  var gh=(CFG&&CFG.github)||{};
-  if(!gh.token||!gh.user||!gh.repo){document.getElementById('gh-list').innerHTML='<div style="color:var(--mute);font-size:12px;font-family:DM Mono,monospace">GitHub not configured</div>';return;}
-  document.getElementById('gh-list').innerHTML='<div style="color:var(--mute);font-size:12px;font-family:DM Mono,monospace">Loading...</div>';
+
+async function toggleUser(uid2,val){
+  if(!activePwDocId)return;
+  var f=find(activePwDocId);if(!f)return;
+  var pws=(f.passwords||[]).map(function(u){return u.id===uid2?Object.assign({},u,{active:val}):u;});
+  try{await db.collection("links").doc(activePwDocId).update({passwords:pws});f.passwords=pws;renderUserList();renderFiles(allFiles);updateStats();toast(val?"Enabled":"Disabled",val?"ok":"info");}
+  catch(e){toast(e.message,"err");}
+}
+
+async function saveEdit(uid2){
+  if(!activePwDocId)return;
+  var f=find(activePwDocId);if(!f)return;
+  var newPw=document.getElementById("epw-"+uid2).value;
+  var newExp=document.getElementById("eexp-"+uid2).value;
   try{
-    var r=await fetch('https://api.github.com/repos/'+gh.user+'/'+gh.repo+'/contents/dashboards',{headers:{Authorization:'token '+gh.token}});
-    if(r.status===404){document.getElementById('gh-list').innerHTML='<div style="color:var(--mute);font-size:12px;font-family:DM Mono,monospace">No files synced yet</div>';return;}
-    var files=await r.json();
-    if(!Array.isArray(files)||!files.length){document.getElementById('gh-list').innerHTML='<div style="color:var(--mute);font-size:12px;font-family:DM Mono,monospace">Repository empty</div>';return;}
-    document.getElementById('gh-list').innerHTML=files.map(function(f){
-      return '<div class="gh-fr"><div class="gh-fn">&#128196; '+esc(f.name)+' <span class="gh-sha">#'+(f.sha||'').slice(0,7)+'</span></div>'+
-        '<div style="display:flex;align-items:center;gap:8px"><span style="font-size:10.5px;color:var(--mute);font-family:DM Mono,monospace">'+formatSize(f.size||0)+'</span>'+
-        '<a href="'+f.html_url+'" target="_blank"><button class="bo">View &#8599;</button></a></div></div>';
-    }).join('');
-  }catch(e){toast('GitHub failed','err');}
+    var masterKey=null;
+    if(newPw&&newPw.length>=3){
+      masterKey=await unsealMK(f.masterKeySeal,auth.currentUser.uid);
+    }
+    var pws=await Promise.all((f.passwords||[]).map(async function(u){
+      if(u.id!==uid2)return u;
+      var up=Object.assign({},u);
+      if(newPw&&newPw.length>=3){
+        var salt=rSalt();
+        up.salt=salt;
+        up.wrappedMasterKey=await wrapMK(masterKey,newPw,salt);
+      }
+      up.expiresAt=newExp?new Date(newExp+"T23:59:59").getTime():null;
+      return up;
+    }));
+    await db.collection("links").doc(activePwDocId).update({passwords:pws});
+    f.passwords=pws;renderUserList();renderFiles(allFiles);toast("Changes saved","ok");
+  }
+  catch(e){toast(e.message,"err");}
 }
-function updateGhDisplay(){
-  var gh=(CFG&&CFG.github)||{};
-  if(gh.user&&gh.repo){document.getElementById('gh-rn').textContent=gh.user+'/'+gh.repo;document.getElementById('gh-ru').textContent='https://github.com/'+gh.user+'/'+gh.repo;}
+
+async function delUser(uid2){
+  if(!activePwDocId)return;
+  var f=find(activePwDocId);if(!f)return;
+  if(!confirm("Remove this user?"))return;
+  var pws=(f.passwords||[]).filter(function(u){return u.id!==uid2;});
+  try{await db.collection("links").doc(activePwDocId).update({passwords:pws});f.passwords=pws;renderUserList();renderFiles(allFiles);updateStats();toast("User removed","ok");}
+  catch(e){toast(e.message,"err");}
 }
+
+function toggleEdit(uid2){document.getElementById("ep-"+uid2).classList.toggle("open");}
 
 /* SETTINGS */
 function loadSettingsUI(){
-  var gh=CFG.github||{};
-  sv('ss-gt',gh.token||'');sv('ss-gu',gh.user||'');sv('ss-gr',gh.repo||'');sv('ss-url',CFG.appUrl||'');
-  /* show hardcoded firebase info */
-  sv('ss-ak',CFG.firebase.apiKey||'');sv('ss-ad',CFG.firebase.authDomain||'');
-  sv('ss-pid',CFG.firebase.projectId||'');sv('ss-aid',CFG.firebase.appId||'');
+  document.getElementById("ss-pid").value=CFG.firebase.projectId||"";
+  document.getElementById("ss-ad").value=CFG.firebase.authDomain||"";
+  document.getElementById("ss-url").value=CFG.appUrl||"";
 }
 function saveSettings(){
-  CFG.github={token:g('ss-gt'),user:g('ss-gu'),repo:g('ss-gr')};
-  CFG.appUrl=g('ss-url');
-  updateGhDisplay();toast('Settings saved','ok');
+  CFG.appUrl=g("ss-url");
+  toast("Settings saved","ok");
 }
 
 /* CLIENT VIEW */
@@ -801,85 +865,175 @@ async function cvStart(id){
   try{
     if(!firebase.apps.length)firebase.initializeApp(CFG.firebase);
     var dbC=firebase.firestore();
-    var doc=await dbC.collection('links').doc(id).get();
-    if(!doc.exists){cvState('notfound');return;}
+    var doc=await dbC.collection("links").doc(id).get();
+    if(!doc.exists){cvState("notfound");return;}
     var data=doc.data();
     cvData={id:id,data:data,db:dbC};
-    if(!data.active){cvState('inactive');return;}
-    if(data.expiresAt&&new Date(data.expiresAt.seconds*1000)<new Date()){cvState('expired');return;}
-    var activePws=(data.passwords||[]).filter(function(p){return p.active;});
-    if(activePws.length>0){
-      document.getElementById('cv-load').style.display='none';
-      document.getElementById('cv-ftag').textContent=data.name||'file.html';
-      document.getElementById('cv-pwcard').style.display='block';
-    }else{
-      cvShow(data,dbC,id,null);
-    }
-  }catch(e){cvState('notfound');}
-}
-async function cvCheck(){
-  if(cvAtt>=MAX_ATT){cvState('locked');return;}
-  var pw=document.getElementById('cv-pwinp').value;
-  if(!pw)return;
-  var btn=document.getElementById('cv-pwbtn'),err=document.getElementById('cv-err');
-  btn.disabled=true;btn.innerHTML='<div class="spn" style="border-top-color:#000"></div>';
-  err.classList.remove('vis');
-  try{
-    var hash=await sha256(pw);
-    var m=(cvData.data.passwords||[]).filter(function(p){return p.active;}).find(function(p){return p.hash===hash;});
-    if(m){
-      cvShow(cvData.data,cvData.db,cvData.id,m.id);
-    }else{
-      cvAtt++;
-      err.classList.add('vis');
-      var left=MAX_ATT-cvAtt;
-      document.getElementById('cv-att').textContent=left>0?left+' attempt'+(left>1?'s':'')+' remaining':'';
-      if(cvAtt>=MAX_ATT){cvState('locked');return;}
-      btn.disabled=false;btn.innerHTML='Unlock &#8594;';
-    }
-  }catch(e){btn.disabled=false;btn.innerHTML='Unlock &#8594;';}
-}
-function cvShow(data,dbC,id,pwId){
-  /* increment views */
-  dbC.collection('links').doc(id).update({views:firebase.firestore.FieldValue.increment(1)}).catch(function(){});
-  if(pwId){
-    var pws=(data.passwords||[]).map(function(p){return p.id===pwId?Object.assign({},p,{views:(p.views||0)+1}):p;});
-    dbC.collection('links').doc(id).update({passwords:pws}).catch(function(){});
-  }
-  /* render content from Firestore */
-  var blob=new Blob([data.content||''],{type:'text/html'});
-  var burl=URL.createObjectURL(blob);
-  document.getElementById('cv-load').style.display='none';
-  document.getElementById('cv-pwcard').style.display='none';
-  var iw=document.getElementById('cviw');
-  iw.style.display='block';
-  document.getElementById('cviframe').src=burl;
-}
-function cvState(s){
-  document.getElementById('cv-load').style.display='none';
-  document.getElementById('cv-pwcard').style.display='none';
-  document.getElementById('cviw').style.display='none';
-  ['cv-inactive','cv-expired','cv-notfound','cv-locked'].forEach(function(x){document.getElementById(x).style.display='none';});
-  document.getElementById('cv-'+s).style.display='block';
-}
-function cvEye(){var i=document.getElementById('cv-pwinp'),p=i.type==='password';i.type=p?'text':'password';document.querySelector('.cv-eye').innerHTML=p?'&#128584;':'&#128065;';}
-function toggleEye(id,btn){var i=document.getElementById(id),p=i.type==='password';i.type=p?'text':'password';btn.innerHTML=p?'&#128584;':'&#128065;';}
+    if(!data.active){cvState("inactive");return;}
 
-/* UTILS */
-function g(id){return(document.getElementById(id)&&document.getElementById(id).value||'').trim();}
-function sv(id,v){var el=document.getElementById(id);if(typeof v==='number')el&&(el.textContent=v);else el&&(el.value=v);}
-function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+    // ── File name login window-এ দেখাও ──
+    if(data.name){
+      var displayName=data.name.replace(/\.html?$/i,""); // .html extension বাদ দাও
+      document.getElementById("cv-brand").textContent=displayName;
+      document.getElementById("cv-tag").textContent="Protected Content";
+    }
+
+    document.getElementById("cv-load").style.display="none";
+    document.getElementById("cv-logincard").style.display="block";
+  }catch(e){cvState("notfound");}
+}
+
+async function cvLogin(){
+  var userId=document.getElementById("cv-uid").value.trim();
+  var pw=document.getElementById("cv-pw").value;
+  if(!userId||!pw)return;
+  var btn=document.getElementById("cv-submit"),err=document.getElementById("cv-err"),att=document.getElementById("cv-att");
+  btn.disabled=true;btn.innerHTML='<div class="spn" style="border-top-color:#000"></div>';
+  err.classList.remove("vis");att.textContent="Decrypting...";
+
+  try{
+    var now=new Date();
+    // User record খোঁজো (active + not expired)
+    var userRec=(cvData.data.passwords||[]).find(function(u){
+      if(!u.active||u.userId!==userId)return false;
+      if(u.expiresAt){
+        var d=u.expiresAt.seconds?new Date(u.expiresAt.seconds*1000):new Date(u.expiresAt);
+        if(d<now)return false;
+      }
+      return true;
+    });
+
+    if(!userRec){
+      // User নেই বা inactive/expired — generic error (security: কোনটা বলব না)
+      throw new Error("invalid");
+    }
+
+    // ── মূল security: password দিয়ে masterKey unwrap করো ──────────────
+    // Wrong password হলে AES-GCM এখানেই DOMException throw করে
+    var masterKey=await unwrapMK(userRec.wrappedMasterKey,pw,userRec.salt);
+
+    // masterKey দিয়ে content decrypt করো
+    var compressedContent=await aesDec(masterKey,cvData.data.encryptedContent.iv,cvData.data.encryptedContent.data);
+    var html=LZString.decompressFromBase64(compressedContent);
+
+    // View count update (background)
+    var pws=(cvData.data.passwords||[]).map(function(u){
+      return u.id===userRec.id?Object.assign({},u,{views:(u.views||0)+1}):u;
+    });
+    cvData.db.collection("links").doc(cvData.id).update({
+      views:firebase.firestore.FieldValue.increment(1),passwords:pws
+    }).catch(function(){});
+
+    // ── Render ──────────────────────────────────────────────────────────
+    var blob=new Blob([html||""],{type:"text/html"});
+    document.getElementById("cv-load").style.display="none";
+    document.getElementById("cv-logincard").style.display="none";
+    document.getElementById("cviw").style.display="block";
+    document.getElementById("cviframe").src=URL.createObjectURL(blob);
+
+  }catch(e){
+    att.textContent="";
+    err.classList.add("vis");
+    // Wrong password বলো, কিন্তু কতটা remaining বলো না (security)
+    document.getElementById("cv-err").textContent="Invalid User ID or Password.";
+    btn.disabled=false;btn.innerHTML="Access Content &#8594;";
+  }
+}
+
+function cvState(s){
+  document.getElementById("cv-load").style.display="none";
+  document.getElementById("cv-logincard").style.display="none";
+  document.getElementById("cviw").style.display="none";
+  ["cv-inactive","cv-notfound","cv-locked"].forEach(function(x){document.getElementById(x).style.display="none";});
+  document.getElementById("cv-"+s).style.display="block";
+}
+function cvEye(){var i=document.getElementById("cv-pw"),p=i.type==="password";i.type=p?"text":"password";document.querySelector(".cv-eye").innerHTML=p?"&#128584;":"&#128065;";}
+function tEye(id,btn){var i=document.getElementById(id),p=i.type==="password";i.type=p?"text":"password";btn.innerHTML=p?"&#128584;":"&#128065;";}
+
+/* ═══════════════════════════════════════════════════════
+   ANTI-INSPECT PROTECTION
+   Right-click, F12, Ctrl+U ইত্যাদি block করে
+   ═══════════════════════════════════════════════════════ */
+(function(){
+  // ── Right-click disable ──────────────────────────────
+  document.addEventListener("contextmenu",function(e){
+    e.preventDefault();
+    return false;
+  });
+
+  // ── Keyboard shortcuts block ─────────────────────────
+  document.addEventListener("keydown",function(e){
+    var k=e.key||"";
+    // F12
+    if(k==="F12"){e.preventDefault();return false;}
+    // Ctrl/Cmd + Shift + I (DevTools)
+    if((e.ctrlKey||e.metaKey)&&e.shiftKey&&(k==="I"||k==="i")){e.preventDefault();return false;}
+    // Ctrl/Cmd + Shift + J (Console)
+    if((e.ctrlKey||e.metaKey)&&e.shiftKey&&(k==="J"||k==="j")){e.preventDefault();return false;}
+    // Ctrl/Cmd + Shift + C (Inspector)
+    if((e.ctrlKey||e.metaKey)&&e.shiftKey&&(k==="C"||k==="c")){e.preventDefault();return false;}
+    // Ctrl/Cmd + U (View Source)
+    if((e.ctrlKey||e.metaKey)&&(k==="U"||k==="u")){e.preventDefault();return false;}
+    // Ctrl/Cmd + S (Save page)
+    if((e.ctrlKey||e.metaKey)&&(k==="S"||k==="s")){e.preventDefault();return false;}
+    // Ctrl/Cmd + P (Print — source দেখা যায়)
+    if((e.ctrlKey||e.metaKey)&&(k==="P"||k==="p")){e.preventDefault();return false;}
+  });
+
+  // ── DevTools open detection ──────────────────────────
+  // Window size পরিবর্তন হলে বুঝতে পারি DevTools খুলেছে
+  var devOpen=false;
+  function checkDev(){
+    var threshold=160;
+    var widthDiff=window.outerWidth-window.innerWidth>threshold;
+    var heightDiff=window.outerHeight-window.innerHeight>threshold;
+    if((widthDiff||heightDiff)&&!devOpen){
+      devOpen=true;
+      // Client view-এ থাকলে content hide করো
+      var iframe=document.getElementById("cviframe");
+      if(iframe&&iframe.src&&iframe.src!==location.href){
+        iframe.src="about:blank";
+        document.getElementById("cviw").style.display="none";
+        // Warning দেখাও
+        cvState("inactive");
+        document.querySelector("#cv-inactive .cv-st-t").textContent="Security Alert";
+        document.querySelector("#cv-inactive .cv-st-s").textContent="Inspection tools detected. Access has been revoked.";
+      }
+    }
+    if(!widthDiff&&!heightDiff){devOpen=false;}
+  }
+  setInterval(checkDev,1000);
+
+  // ── Console খোলা হলে redirect ───────────────────────
+  var _c=console.log.bind(console);
+  var consoleOpened=false;
+  Object.defineProperty(window,"_devcheck",{
+    get:function(){
+      if(!consoleOpened){
+        consoleOpened=true;
+        var iframe=document.getElementById("cviframe");
+        if(iframe&&iframe.src&&iframe.src!==location.href){
+          iframe.src="about:blank";
+          document.getElementById("cviw").style.display="none";
+          cvState("inactive");
+        }
+      }
+      return 0;
+    }
+  });
+  setInterval(function(){void window._devcheck;},500);
+
+})();
+function g(id){return(document.getElementById(id)&&document.getElementById(id).value||"").trim();}
+function svn(id,v){var el=document.getElementById(id);if(el)el.textContent=v;}
+function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
 function find(id){return allFiles.find(function(f){return f.id===id;});}
-function formatSize(b){if(b<1024)return b+' B';if(b<1048576)return(b/1024).toFixed(1)+' KB';return(b/1048576).toFixed(2)+' MB';}
-function formatDate(ts){if(!ts)return'';var d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'2-digit'});}
-function todayStr(){return new Date().toISOString().split('T')[0];}
+function formatSize(b){if(b<1024)return b+" B";if(b<1048576)return(b/1024).toFixed(1)+" KB";return(b/1048576).toFixed(2)+" MB";}
+function formatDate(ts){if(!ts)return"";var d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"2-digit"});}
 function toast(msg,type){
-  type=type||'ok';
-  var el=document.getElementById('toast'),icons={ok:'&#10003;',err:'&#10007;',info:'&#8505;'};
-  document.getElementById('t-ico').innerHTML=icons[type]||'&#10003;';
-  document.getElementById('t-msg').textContent=msg;
-  el.className='on '+type;
-  clearTimeout(_t);_t=setTimeout(function(){el.classList.remove('on');},3000);
+  type=type||"ok";var el=document.getElementById("toast"),icons={ok:"&#10003;",err:"&#10007;",info:"&#8505;"};
+  document.getElementById("t-ico").innerHTML=icons[type]||"&#10003;";document.getElementById("t-msg").innerHTML=msg;
+  el.className="on "+type;clearTimeout(_t);_t=setTimeout(function(){el.classList.remove("on");},3000);
 }
 </script>
 </body>
