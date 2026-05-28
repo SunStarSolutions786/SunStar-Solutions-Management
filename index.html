@@ -5,6 +5,12 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
 <title>SunStar Solutions Management</title>
 <meta name="theme-color" content="#EFA800"/>
+<!-- DNS prefetch & preconnect for faster Firebase load -->
+<link rel="preconnect" href="https://www.gstatic.com" crossorigin/>
+<link rel="preconnect" href="https://firestore.googleapis.com" crossorigin/>
+<link rel="preconnect" href="https://identitytoolkit.googleapis.com" crossorigin/>
+<link rel="dns-prefetch" href="https://www.gstatic.com"/>
+<link rel="dns-prefetch" href="https://firebaseio.com"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <style>
@@ -323,9 +329,11 @@ button{font-family:'DM Sans',sans-serif;cursor:pointer;}
   .settings-grid{grid-template-columns:1fr;}
   .cv-card{padding:32px 24px;}
 }
+#pg-bar{position:fixed;top:0;left:0;height:3px;width:0;background:linear-gradient(90deg,var(--gold),#C88A00);z-index:9999;transition:width .4s ease;border-radius:0 2px 2px 0;}
 </style>
 </head>
 <body>
+<div id="pg-bar"></div>
 <div class="grid-bg"></div>
 <div class="glow-orb orb-1"></div>
 <div class="glow-orb orb-2"></div>
@@ -631,25 +639,9 @@ button{font-family:'DM Sans',sans-serif;cursor:pointer;}
       <div class="modal-sub" id="cm-link-name">—</div>
     </div>
     <div class="modal-body">
-      <div class="divider"><span>Add New Client</span></div>
-      <div class="add-client-grid">
-        <div class="fg"><label class="fl">Full Name</label><input class="fi" id="cm-fullname" placeholder="e.g. Rahim Ahmed"/></div>
-        <div class="fg"><label class="fl">Client ID</label><input class="fi" id="cm-uid" placeholder="e.g. rahim_2024"/></div>
-      </div>
-      <div class="add-client-row">
-        <div class="fg">
-          <label class="fl">Password</label>
-          <div class="fi-wrap">
-            <input class="fi" id="cm-pw" type="password" placeholder="Min 4 characters" onkeydown="if(event.key==='Enter')addClient()"/>
-            <button class="eye-btn" onclick="tEye('cm-pw',this)">👁</button>
-          </div>
-        </div>
-        <div class="fg">
-          <label class="fl">Expiry Date</label>
-          <input class="fi" id="cm-exp" type="date"/>
-        </div>
-        <button class="btn-add-user" onclick="addClient()">+ Add Client</button>
-      </div>
+      <!-- Add Client Button -->
+      <button class="btn-confirm" style="width:100%;margin-bottom:16px;padding:13px;" onclick="openAddClient()">+ Add New Client</button>
+
       <div class="divider"><span>Clients (<span id="cm-count">0</span>)</span></div>
       <div class="client-list" id="cm-list"></div>
     </div>
@@ -679,7 +671,78 @@ button{font-family:'DM Sans',sans-serif;cursor:pointer;}
   </div>
 </div>
 
-<!-- TOAST -->
+<!-- ══════════════════════════════════════════
+     ADD CLIENT MODAL
+══════════════════════════════════════════ -->
+<div class="overlay" id="addclient-ov" style="z-index:600;">
+  <div class="modal modal-md">
+    <div class="modal-hdr">
+      <div class="modal-title">➕ Add New Client</div>
+      <div class="modal-sub" id="addclient-sub">—</div>
+    </div>
+    <div class="modal-body">
+      <div class="add-client-grid">
+        <div class="fg"><label class="fl">Full Name</label><input class="fi" id="cm-fullname" placeholder="e.g. Rahim Ahmed"/></div>
+        <div class="fg"><label class="fl">Client ID</label><input class="fi" id="cm-uid" placeholder="e.g. rahim_2024"/></div>
+      </div>
+      <div class="add-client-grid">
+        <div class="fg">
+          <label class="fl">Password</label>
+          <div class="fi-wrap">
+            <input class="fi" id="cm-pw" type="password" placeholder="Min 4 characters" onkeydown="if(event.key==='Enter')addClient()"/>
+            <button class="eye-btn" onclick="tEye('cm-pw',this)">👁</button>
+          </div>
+        </div>
+        <div class="fg">
+          <label class="fl">Expiry Date</label>
+          <input class="fi" id="cm-exp" type="date"/>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-cancel" onclick="closeAddClient()">Cancel</button>
+      <button class="btn-confirm" id="addclient-btn" onclick="addClient()">➕ Add Client</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     CLIENT EDIT MODAL (separate overlay)
+══════════════════════════════════════════ -->
+<div class="overlay" id="cedit-ov" style="z-index:600;">
+  <div class="modal modal-md">
+    <div class="modal-hdr">
+      <div class="modal-title">✏️ Edit Client</div>
+      <div class="modal-sub" id="cedit-sub">—</div>
+    </div>
+    <div class="modal-body">
+      <div class="add-client-grid">
+        <div class="fg"><label class="fl">Full Name</label><input class="fi" id="cedit-fn" placeholder="Full name"/></div>
+        <div class="fg"><label class="fl">Client ID</label><input class="fi" id="cedit-uid" placeholder="Client ID"/></div>
+      </div>
+      <div class="add-client-grid">
+        <div class="fg">
+          <label class="fl">New Password</label>
+          <div class="fi-wrap">
+            <input class="fi" id="cedit-pw" type="password" placeholder="Leave blank to keep"/>
+            <button class="eye-btn" onclick="tEye('cedit-pw',this)">👁</button>
+          </div>
+        </div>
+        <div class="fg"><label class="fl">Expiry Date</label><input class="fi" id="cedit-exp" type="date"/></div>
+      </div>
+      <div class="fg">
+        <label class="fl">Note (optional)</label>
+        <input class="fi" id="cedit-note" placeholder="e.g. Monthly plan, VIP client..."/>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-cancel" onclick="closeCEdit()">Cancel</button>
+      <button class="btn-confirm" id="cedit-btn" onclick="saveCEdit()">💾 Save Changes</button>
+    </div>
+  </div>
+</div>
+
+
 <div id="toast-wrap"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.4.4/lz-string.min.js"></script>
@@ -769,9 +832,24 @@ function uid4(){return Math.random().toString(36).slice(2,10);}
 
 /* ═══════════════════════ BOOT ═══════════════════════ */
 window.addEventListener("DOMContentLoaded",function(){
+  var pb=document.getElementById("pg-bar");
+  pb.style.width="40%";
+  setTimeout(function(){pb.style.width="70%";},200);
   var vid=new URLSearchParams(location.search).get("view");
-  if(vid){showScreen("cv");cvStart(vid);return;}
+  if(vid){
+    pb.style.width="90%";
+    showScreen("cv");
+    cvStart(vid).then(function(){
+      pb.style.width="100%";
+      setTimeout(function(){pb.style.opacity="0";},400);
+    }).catch(function(){
+      pb.style.width="100%";
+    });
+    return;
+  }
+  pb.style.width="90%";
   initFB();
+  setTimeout(function(){pb.style.opacity="0";},800);
 });
 
 function showScreen(id){
@@ -789,7 +867,10 @@ function showPage(p){
 function initFB(){
   try{
     if(!firebase.apps.length)firebase.initializeApp(CFG.firebase);
-    auth=firebase.auth();db=firebase.firestore();
+    auth=firebase.auth();
+    db=firebase.firestore();
+    // ── Offline cache: repeat visits load instantly from local cache ──
+    db.enablePersistence({synchronizeTabs:true}).catch(function(){});
     auth.onAuthStateChanged(function(u){if(u)showApp(u);else showScreen("auth");});
   }catch(e){
     document.body.innerHTML='<div style="display:flex;height:100vh;align-items:center;justify-content:center;color:#FF4466;font-family:sans-serif;text-align:center;padding:20px;">Firebase Error: '+e.message+'</div>';
@@ -821,7 +902,7 @@ function showApp(u){
   var em=u.email||"";
   document.getElementById("u-nm").textContent=em.split("@")[0]||"Admin";
   document.getElementById("u-av").textContent=(em[0]||"A").toUpperCase();
-  loadSettingsUI();loadLinks();
+  loadSettingsFromDB().then(function(){loadLinks();});
 }
 
 /* ═══════════════════════ LINKS ═══════════════════════ */
@@ -1055,7 +1136,7 @@ async function doCreateLink(){
 
     // ── Auto-add admin master password client ───────────────
     var adminClients=[];
-    var masterPw=localStorage.getItem("ss_masterPw");
+    var masterPw=window._adminMasterPw;
     var adminEmail=(auth.currentUser.email||"admin").split("@")[0];
     if(masterPw&&masterPw.length>=4){
       var aSalt=rSalt();
@@ -1094,14 +1175,24 @@ function openClients(id){
   activeDocId=id;
   var f=find(id);if(!f)return;
   document.getElementById("cm-link-name").textContent=f.displayName||f.name;
-  document.getElementById("cm-fullname").value="";
-  document.getElementById("cm-uid").value="";
-  document.getElementById("cm-pw").value="";
-  document.getElementById("cm-exp").value="";
   renderClientList();
   document.getElementById("clients-ov").classList.add("on");
 }
 function closeClients(){document.getElementById("clients-ov").classList.remove("on");activeDocId=null;}
+
+function openAddClient(){
+  if(!activeDocId)return;
+  var f=find(activeDocId);if(!f)return;
+  document.getElementById("addclient-sub").textContent=f.displayName||f.name;
+  document.getElementById("cm-fullname").value="";
+  document.getElementById("cm-uid").value="";
+  document.getElementById("cm-pw").value="";
+  document.getElementById("cm-exp").value="";
+  document.getElementById("addclient-btn").disabled=false;
+  document.getElementById("addclient-btn").innerHTML="➕ Add Client";
+  document.getElementById("addclient-ov").classList.add("on");
+}
+function closeAddClient(){document.getElementById("addclient-ov").classList.remove("on");}
 
 function expInfo(u){
   if(!u.expiresAt)return{status:'none',text:'No expiry',cls:''};
@@ -1147,27 +1238,10 @@ function renderClientList(){
         '</div>'+
       '</div>'+
       '<div style="display:flex;gap:6px;padding:10px 15px;border-top:1px solid var(--border);flex-wrap:wrap;">'+
-        '<button class="act-btn" style="flex:1;justify-content:center;color:var(--info);border-color:rgba(75,159,255,0.2);background:var(--info-dim);font-size:12px;" onclick="toggleClientEdit(\''+u.id+'\')">✏️ Edit</button>'+
+        '<button class="act-btn" style="flex:1;justify-content:center;color:var(--info);border-color:rgba(75,159,255,0.2);background:var(--info-dim);font-size:12px;" onclick="openCEdit(\''+u.id+'\')">✏️ Edit</button>'+
         '<button class="act-btn" style="flex:1;justify-content:center;font-size:12px;" onclick="openActivity(\''+u.id+'\')">📊 Activity</button>'+
         '<button class="act-btn" style="flex:1;justify-content:center;font-size:12px;'+(isActive?'color:var(--warn);border-color:rgba(245,158,11,0.2);background:var(--warn-dim);':'color:var(--ok);border-color:rgba(31,209,122,0.2);background:var(--ok-dim);')+'" onclick="toggleClient(\''+u.id+'\','+(isActive?'false':'true')+')">'+(isActive?'⏸ Disable':'▶ Enable')+'</button>'+
         '<button class="act-btn del" style="flex:1;justify-content:center;font-size:12px;" onclick="delClient(\''+u.id+'\')">🗑 Remove</button>'+
-      '</div>'+
-      '<div class="ci-edit-panel" id="cep-'+u.id+'">'+
-        '<div class="edit-row">'+
-          '<div class="fg"><label class="fl">Full Name</label><input class="fi" id="efn-'+u.id+'" value="'+esc(u.fullName||'')+'"/></div>'+
-          '<div class="fg"><label class="fl">Client ID</label><input class="fi" id="euid-'+u.id+'" value="'+esc(u.userId||'')+'" placeholder="Client ID"/></div>'+
-        '</div>'+
-        '<div class="edit-row">'+
-          '<div class="fg"><label class="fl">New Password</label>'+
-            '<div class="fi-wrap"><input class="fi" id="epw-'+u.id+'" type="password" placeholder="Leave blank to keep"/>'+
-            '<button class="eye-btn" onclick="tEye(\'epw-'+u.id+'\',this)">👁</button></div></div>'+
-          '<div class="fg"><label class="fl">Expiry Date</label><input class="fi" id="eexp-'+u.id+'" type="date" value="'+eVal+'"/></div>'+
-        '</div>'+
-        '<div class="fg" style="margin-bottom:10px;"><label class="fl">Note</label><input class="fi" id="enote-'+u.id+'" value="'+esc(u.note||'')+'" placeholder="Subscription note (optional)"/></div>'+
-        '<div class="edit-btns">'+
-          '<button class="btn-xs save" onclick="saveClientEdit(\''+u.id+'\')">💾 Save Changes</button>'+
-          '<button class="btn-xs" onclick="toggleClientEdit(\''+u.id+'\')">Cancel</button>'+
-        '</div>'+
       '</div>'+
     '</div>';
   }).join('');
@@ -1195,10 +1269,7 @@ async function addClient(){
     var pws=(f.passwords||[]).concat([nu]);
     await db.collection("links").doc(activeDocId).update({passwords:pws});
     f.passwords=pws;
-    document.getElementById("cm-fullname").value="";
-    document.getElementById("cm-uid").value="";
-    document.getElementById("cm-pw").value="";
-    document.getElementById("cm-exp").value="";
+    closeAddClient();
     renderClientList();renderLinks(allLinks);updateStats();
     toast('"'+(fullName||userId)+'" added successfully',"ok");
   }catch(e){toast("Error: "+e.message,"err");}
@@ -1215,39 +1286,6 @@ async function toggleClient(uid2,val){
   }catch(e){toast(e.message,"err");}
 }
 
-async function saveClientEdit(uid2){
-  if(!activeDocId)return;
-  var f=find(activeDocId);if(!f)return;
-  var newPw=document.getElementById("epw-"+uid2).value;
-  var newExp=document.getElementById("eexp-"+uid2).value;
-  var newFn=(document.getElementById("efn-"+uid2).value||"").trim();
-  var newUid=(document.getElementById("euid-"+uid2).value||"").trim();
-  var newNote=(document.getElementById("enote-"+uid2).value||"").trim();
-  // Check duplicate ID if changed
-  if(newUid){
-    var dup=(f.passwords||[]).find(function(u){return u.userId===newUid&&u.id!==uid2;});
-    if(dup){toast("Client ID '"+newUid+"' already exists","err");return;}
-  }
-  try{
-    var masterKey=null;
-    if(newPw&&newPw.length>=4)masterKey=await unsealMK(f.masterKeySeal,auth.currentUser.uid);
-    var pws=await Promise.all((f.passwords||[]).map(async function(u){
-      if(u.id!==uid2)return u;
-      var up=Object.assign({},u);
-      if(newPw&&newPw.length>=4){var salt=rSalt();up.salt=salt;up.wrappedMasterKey=await wrapMK(masterKey,newPw,salt);}
-      if(newFn)up.fullName=newFn;
-      if(newUid)up.userId=newUid;
-      up.note=newNote;
-      up.expiresAt=newExp?new Date(newExp+"T23:59:59").getTime():null;
-      return up;
-    }));
-    await db.collection("links").doc(activeDocId).update({passwords:pws});
-    f.passwords=pws;
-    renderClientList();renderLinks(allLinks);
-    toast("Client updated successfully","ok");
-  }catch(e){toast(e.message,"err");}
-}
-
 async function delClient(uid2){
   if(!activeDocId)return;
   var f=find(activeDocId);if(!f)return;
@@ -1261,8 +1299,58 @@ async function delClient(uid2){
   }catch(e){toast(e.message,"err");}
 }
 
-function toggleClientEdit(uid2){
-  document.getElementById("cep-"+uid2).classList.toggle("open");
+/* ═══════════════════════ CLIENT EDIT MODAL ═══════════════════════ */
+var _ceditId=null;
+function openCEdit(uid2){
+  if(!activeDocId)return;
+  var f=find(activeDocId);if(!f)return;
+  var u=find2(f,uid2);if(!u)return;
+  _ceditId=uid2;
+  document.getElementById("cedit-sub").textContent=(u.fullName||u.userId)+" · Client ID: "+u.userId;
+  document.getElementById("cedit-fn").value=u.fullName||"";
+  document.getElementById("cedit-uid").value=u.userId||"";
+  document.getElementById("cedit-pw").value="";
+  document.getElementById("cedit-exp").value=u.expiresAt?new Date(u.expiresAt).toISOString().split('T')[0]:"";
+  document.getElementById("cedit-note").value=u.note||"";
+  document.getElementById("cedit-btn").disabled=false;
+  document.getElementById("cedit-btn").innerHTML="💾 Save Changes";
+  document.getElementById("cedit-ov").classList.add("on");
+}
+function closeCEdit(){document.getElementById("cedit-ov").classList.remove("on");_ceditId=null;}
+
+async function saveCEdit(){
+  if(!_ceditId||!activeDocId)return;
+  var f=find(activeDocId);if(!f)return;
+  var newPw=document.getElementById("cedit-pw").value;
+  var newExp=document.getElementById("cedit-exp").value;
+  var newFn=document.getElementById("cedit-fn").value.trim();
+  var newUid=document.getElementById("cedit-uid").value.trim();
+  var newNote=document.getElementById("cedit-note").value.trim();
+  if(newUid){
+    var dup=(f.passwords||[]).find(function(u){return u.userId===newUid&&u.id!==_ceditId;});
+    if(dup){toast("Client ID '"+newUid+"' already exists","err");return;}
+  }
+  var btn=document.getElementById("cedit-btn");
+  btn.disabled=true;btn.innerHTML='<div class="spn"></div>Saving...';
+  try{
+    var masterKey=null;
+    if(newPw&&newPw.length>=4)masterKey=await unsealMK(f.masterKeySeal,auth.currentUser.uid);
+    var pws=await Promise.all((f.passwords||[]).map(async function(u){
+      if(u.id!==_ceditId)return u;
+      var up=Object.assign({},u);
+      if(newPw&&newPw.length>=4){var s=rSalt();up.salt=s;up.wrappedMasterKey=await wrapMK(masterKey,newPw,s);}
+      if(newFn)up.fullName=newFn;
+      if(newUid)up.userId=newUid;
+      up.note=newNote;
+      up.expiresAt=newExp?new Date(newExp+"T23:59:59").getTime():null;
+      return up;
+    }));
+    await db.collection("links").doc(activeDocId).update({passwords:pws});
+    f.passwords=pws;
+    closeCEdit();
+    renderClientList();renderLinks(allLinks);
+    toast("Client updated successfully","ok");
+  }catch(e){toast(e.message,"err");btn.disabled=false;btn.innerHTML="💾 Save Changes";}
 }
 
 /* ═══════════════════════ ACTIVITY MODAL ═══════════════════════ */
@@ -1313,31 +1401,51 @@ function openActivity(uid2){
 function closeActivity(){document.getElementById("act-ov").classList.remove("on");actClientData=null;}
 
 /* ═══════════════════════ SETTINGS ═══════════════════════ */
+async function loadSettingsFromDB(){
+  try{
+    var uid=auth.currentUser.uid;
+    var doc=await db.collection("settings").doc(uid).get();
+    if(doc.exists){
+      var d=doc.data();
+      if(d.appUrl)CFG.appUrl=d.appUrl;
+      if(d.masterPw)window._adminMasterPw=d.masterPw;
+    }
+  }catch(e){}
+  loadSettingsUI();
+}
 function loadSettingsUI(){
   document.getElementById("ss-pid").value=CFG.firebase.projectId||"";
   document.getElementById("ss-ad").value=CFG.firebase.authDomain||"";
   document.getElementById("ss-url").value=CFG.appUrl||"";
-  // Load saved master pw hint
-  var saved=localStorage.getItem("ss_masterPw_set");
   var st=document.getElementById("ss-masterStatus");
-  if(saved){st.style.display="block";st.innerHTML='<span style="color:var(--ok);">✓ Master password is set. Enter new password to change.</span>';}
+  if(window._adminMasterPw){
+    st.style.display="block";
+    st.innerHTML='<span style="color:var(--ok);">✓ Master password is set. Enter new value to change.</span>';
+  }
 }
-function saveSettings(){
-  CFG.appUrl=g("ss-url");
+async function saveSettings(){
+  var url=g("ss-url");
   var mp=document.getElementById("ss-masterPw").value;
   var st=document.getElementById("ss-masterStatus");
+  if(mp&&mp.length<4){toast("Master password must be at least 4 characters","err");return;}
+  var uid=auth.currentUser.uid;
+  var toSave={appUrl:url};
   if(mp&&mp.length>=4){
-    localStorage.setItem("ss_masterPw",mp);
-    localStorage.setItem("ss_masterPw_set","1");
-    st.style.display="block";
-    st.innerHTML='<span style="color:var(--ok);">✓ Master password saved.</span>';
-    document.getElementById("ss-masterPw").value="";
-    toast("Settings saved. Master password updated.","ok");
-  }else if(mp&&mp.length<4){
-    toast("Master password must be at least 4 characters","err");
-  }else{
-    toast("Settings saved","ok");
+    toSave.masterPw=mp;
+    window._adminMasterPw=mp;
   }
+  try{
+    await db.collection("settings").doc(uid).set(toSave,{merge:true});
+    CFG.appUrl=url;
+    if(mp&&mp.length>=4){
+      st.style.display="block";
+      st.innerHTML='<span style="color:var(--ok);">✓ Master password saved.</span>';
+      document.getElementById("ss-masterPw").value="";
+      toast("Settings saved. Master password updated.","ok");
+    }else{
+      toast("Settings saved","ok");
+    }
+  }catch(e){toast("Save error: "+e.message,"err");}
 }
 
 /* ═══════════════════════ CLIENT VIEW ═══════════════════════ */
@@ -1345,6 +1453,8 @@ async function cvStart(id){
   try{
     if(!firebase.apps.length)firebase.initializeApp(CFG.firebase);
     var dbC=firebase.firestore();
+    // ── Cache for client view too ──
+    dbC.enablePersistence().catch(function(){});
     var doc=await dbC.collection("links").doc(id).get();
     if(!doc.exists){cvShowState("notfound");return;}
     var data=doc.data();
