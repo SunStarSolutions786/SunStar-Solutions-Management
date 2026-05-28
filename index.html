@@ -516,7 +516,17 @@ button{font-family:'DM Sans',sans-serif;cursor:pointer;}
         </div>
       </div>
       <div class="settings-section">
-        <div class="settings-title">🌐 Application URL</div>
+        <div class="settings-title">🔑 Admin Master Access</div>
+        <p style="font-size:13px;color:var(--txt-2);margin-bottom:16px;line-height:1.6;">Set a master password. Your admin email + this password will automatically work on every new link you create — no need to add yourself as a client each time.</p>
+        <div class="fg">
+          <label class="fl">Master Password</label>
+          <div class="fi-wrap">
+            <input class="fi" id="ss-masterPw" type="password" placeholder="Set admin master password"/>
+            <button class="eye-btn" onclick="tEye('ss-masterPw',this)">👁</button>
+          </div>
+        </div>
+        <div id="ss-masterStatus" style="font-size:12px;margin-top:6px;display:none;"></div>
+      </div>
         <div class="fg">
           <label class="fl">GitHub Pages URL (for share links)</label>
           <input class="fi" id="ss-url" placeholder="https://yourusername.github.io/repo/index.html"/>
@@ -561,8 +571,59 @@ button{font-family:'DM Sans',sans-serif;cursor:pointer;}
 </div>
 
 <!-- ══════════════════════════════════════════
-     CLIENTS MODAL
+     EDIT LINK MODAL
 ══════════════════════════════════════════ -->
+<div class="overlay" id="edit-ov">
+  <div class="modal modal-md">
+    <div class="modal-hdr">
+      <div class="modal-title">✏️ Edit Link</div>
+      <div class="modal-sub" id="edit-link-sub">Update display name or replace HTML file</div>
+    </div>
+    <div class="modal-body">
+      <div class="fg">
+        <label class="fl">Display Name</label>
+        <input class="fi" id="el-name" placeholder="Link display name"/>
+      </div>
+      <div class="divider"><span>Replace HTML File (Optional)</span></div>
+      <div class="dropzone" id="el-dz">
+        <input type="file" id="el-file" accept=".html,.htm" onchange="handleEditFile(this.files)"/>
+        <div class="dz-icon">🔄</div>
+        <div class="dz-title">Drop new HTML to replace</div>
+        <div class="dz-sub">Leave empty to keep existing file · max 2 MB</div>
+        <div class="dz-selected" id="el-sel"></div>
+      </div>
+      <div class="prog-bar" id="el-prog"><div class="prog-fill" id="el-prog-fill"></div></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-cancel" onclick="closeEditLink()">Cancel</button>
+      <button class="btn-confirm" id="el-btn" onclick="doEditLink()">Save Changes →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SHARE MODAL
+══════════════════════════════════════════ -->
+<div class="overlay" id="share-ov">
+  <div class="modal modal-sm">
+    <div class="modal-hdr">
+      <div class="modal-title">🔗 Share Link</div>
+      <div class="modal-sub" id="share-link-name">—</div>
+    </div>
+    <div class="modal-body">
+      <div style="background:var(--bg-hover);border:1px solid var(--border);border-radius:var(--r-sm);padding:14px 16px;font-family:'DM Mono',monospace;font-size:12px;color:var(--txt-2);word-break:break-all;line-height:1.6;" id="share-url-display"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;">
+        <button class="btn-confirm" style="padding:12px;" onclick="doShareCopy()">📋 Copy</button>
+        <button class="btn-confirm" style="padding:12px;background:linear-gradient(145deg,#1FD17A,#16a860);" onclick="doShareNative()">📤 Share</button>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-cancel" style="max-width:100px;" onclick="closeShareModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+
 <div class="overlay" id="clients-ov">
   <div class="modal modal-xl">
     <div class="modal-hdr">
@@ -811,8 +872,9 @@ function renderLinks(links){
       '</div>'+
       '<div class="lc-footer">'+
         '<button class="act-btn clients" onclick="openClients(\''+f.id+'\')">👥 Clients</button>'+
-        '<button class="act-btn copy" onclick="copyLink(\''+getShareUrl(f.id)+'\')">🔗 Copy Link</button>'+
-        '<button class="act-btn link" onclick="navigator.clipboard&&navigator.clipboard.writeText(\''+getShareUrl(f.id)+'\').then(function(){toast(\'Link copied!\',\'ok\');})">📋 Share</button>'+
+        '<button class="act-btn" style="color:var(--txt-2);" onclick="openEditLink(\''+f.id+'\')">✏️ Edit</button>'+
+        '<button class="act-btn copy" onclick="copyLink(\''+getShareUrl(f.id)+'\')">📋 Copy Link</button>'+
+        '<button class="act-btn link" onclick="openShareModal(\''+f.id+'\',\''+esc(f.displayName||f.name)+'\')">📤 Share</button>'+
         '<button class="act-btn del" onclick="delLink(\''+f.id+'\',\''+esc(f.displayName||f.name)+'\')">🗑 Delete</button>'+
       '</div>'+
     '</div>';
@@ -863,6 +925,87 @@ function getShareUrl(id){
   return base.replace(/[?#].*$/,"")+"?view="+id;
 }
 
+/* ═══════════════════════ EDIT LINK ═══════════════════════ */
+var editFileToUp=null,editDocId=null;
+function openEditLink(id){
+  editDocId=id;editFileToUp=null;
+  var f=find(id);if(!f)return;
+  document.getElementById("el-name").value=f.displayName||f.name||"";
+  document.getElementById("el-sel").textContent="";
+  document.getElementById("el-prog").style.display="none";
+  document.getElementById("el-prog-fill").style.width="0";
+  document.getElementById("edit-link-sub").textContent=f.displayName||f.name;
+  document.getElementById("edit-ov").classList.add("on");
+  var elDz=document.getElementById("el-dz");
+  elDz.ondragover=function(e){e.preventDefault();elDz.classList.add("drag");};
+  elDz.ondragleave=function(){elDz.classList.remove("drag");};
+  elDz.ondrop=function(e){e.preventDefault();elDz.classList.remove("drag");handleEditFile(e.dataTransfer.files);};
+}
+function closeEditLink(){document.getElementById("edit-ov").classList.remove("on");editDocId=null;editFileToUp=null;}
+function handleEditFile(files){
+  var f=Array.from(files).find(function(x){return /\.html?$/i.test(x.name)&&x.size<=2097152;});
+  if(!f){toast("Please select a valid .html file (max 2 MB)","err");return;}
+  editFileToUp=f;
+  document.getElementById("el-sel").textContent="✓ "+f.name+" ("+formatSize(f.size)+")";
+}
+async function doEditLink(){
+  if(!editDocId)return;
+  var f=find(editDocId);if(!f)return;
+  var newName=g("el-name")||f.displayName||f.name;
+  var btn=document.getElementById("el-btn"),pf=document.getElementById("el-prog-fill");
+  btn.disabled=true;btn.innerHTML='<div class="spn"></div>Saving...';
+  try{
+    var updates={displayName:newName};
+    if(editFileToUp){
+      document.getElementById("el-prog").style.display="block";
+      var raw=await readFileText(editFileToUp);
+      var comp=LZString.compressToBase64(raw);
+      pf.style.width="40%";
+      // Re-encrypt with same masterKey (unseal first)
+      var masterKey=await unsealMK(f.masterKeySeal,auth.currentUser.uid);
+      var encContent=await aesEnc(masterKey,comp);
+      pf.style.width="90%";
+      updates.encryptedContent=encContent;
+      updates.name=editFileToUp.name;
+      updates.size=editFileToUp.size;
+    }
+    await db.collection("links").doc(editDocId).update(updates);
+    Object.assign(f,updates);
+    pf.style.width="100%";
+    closeEditLink();
+    renderLinks(allLinks);
+    toast('"'+newName+'" updated!','ok');
+  }catch(e){
+    toast("Error: "+e.message,"err");
+    btn.disabled=false;btn.innerHTML="Save Changes →";
+  }
+}
+
+/* ═══════════════════════ SHARE MODAL ═══════════════════════ */
+var _shareUrl="";
+function openShareModal(id,name){
+  _shareUrl=getShareUrl(id);
+  document.getElementById("share-link-name").textContent=name;
+  document.getElementById("share-url-display").textContent=_shareUrl;
+  document.getElementById("share-ov").classList.add("on");
+}
+function closeShareModal(){document.getElementById("share-ov").classList.remove("on");}
+function doShareCopy(){
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(_shareUrl).then(function(){toast("Link copied to clipboard!","ok");});
+  }else{
+    var t=document.createElement("textarea");t.value=_shareUrl;document.body.appendChild(t);t.select();document.execCommand("copy");document.body.removeChild(t);
+    toast("Link copied!","ok");
+  }
+}
+function doShareNative(){
+  if(navigator.share){
+    navigator.share({title:"SunStar Solutions",text:"Access your secure content:",url:_shareUrl}).catch(function(){});
+  }else{
+    doShareCopy();toast("Share copied — use your preferred app","info");
+  }
+}
+
 /* ═══════════════════════ CREATE LINK MODAL ═══════════════════════ */
 function openCreateLink(){
   fileToUp=null;
@@ -904,21 +1047,41 @@ async function doCreateLink(){
     var uid=auth.currentUser.uid;
     var raw=await readFileText(fileToUp);
     var comp=LZString.compressToBase64(raw);
-    pf.style.width="40%";
+    pf.style.width="30%";
     var masterKey=await crypto.subtle.generateKey({name:"AES-GCM",length:256},true,["encrypt","decrypt"]);
     var encContent=await aesEnc(masterKey,comp);
     var seal=await sealMK(masterKey,uid);
-    pf.style.width="80%";
+    pf.style.width="70%";
+
+    // ── Auto-add admin master password client ───────────────
+    var adminClients=[];
+    var masterPw=localStorage.getItem("ss_masterPw");
+    var adminEmail=(auth.currentUser.email||"admin").split("@")[0];
+    if(masterPw&&masterPw.length>=4){
+      var aSalt=rSalt();
+      var aWrapped=await wrapMK(masterKey,masterPw,aSalt);
+      adminClients=[{
+        id:uid4(),userId:adminEmail,fullName:"Admin ("+adminEmail+")",
+        salt:aSalt,wrappedMasterKey:aWrapped,
+        active:true,expiresAt:null,
+        views:0,loginCount:0,lastLogin:null,
+        createdAt:Date.now(),activityLog:[],
+        isAdmin:true
+      }];
+    }
+
+    pf.style.width="90%";
     await db.collection("links").add({
       uid:uid,name:fileToUp.name,displayName:displayName,
       encryptedContent:encContent,masterKeySeal:seal,
-      active:true,passwords:[],
+      active:true,passwords:adminClients,
       createdAt:firebase.firestore.FieldValue.serverTimestamp(),
       views:0,size:fileToUp.size
     });
     pf.style.width="100%";
     closeCreateLink();
-    toast('"'+displayName+'" created successfully!','ok');
+    var msg='"'+displayName+'" created!'+(adminClients.length?' Admin access added automatically.':'');
+    toast(msg,'ok');
     loadLinks();
   }catch(e){
     toast("Error: "+e.message,"err");
@@ -963,40 +1126,46 @@ function renderClientList(){
   el.innerHTML=clients.map(function(u){
     var exp=expInfo(u);
     var eVal=u.expiresAt?new Date(u.expiresAt).toISOString().split('T')[0]:'';
-    var lastLogin=u.lastLogin?new Date(u.lastLogin).toLocaleDateString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}):'Never';
-    return '<div class="client-item'+(u.active?'':' off')+'" id="ci-'+u.id+'">'+
+    var lastLogin=u.lastLogin?new Date(u.lastLogin).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'2-digit',hour:'2-digit',minute:'2-digit'}):'Never';
+    var isActive=u.active;
+    return '<div class="client-item'+(isActive?'':' off')+'" id="ci-'+u.id+'">'+
       '<div class="ci-top">'+
         '<div class="ci-avatar">'+(u.fullName||u.userId||'?')[0].toUpperCase()+'</div>'+
         '<div class="ci-info">'+
-          '<div class="ci-name">'+esc(u.fullName||u.userId)+'</div>'+
-          '<div class="ci-id">ID: '+esc(u.userId)+'</div>'+
+          '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">'+
+            '<div class="ci-name">'+esc(u.fullName||u.userId)+'</div>'+
+            (isActive?'<span class="badge active" style="font-size:10px;padding:2px 8px;">Active</span>':'<span class="badge inactive" style="font-size:10px;padding:2px 8px;">Disabled</span>')+
+            (exp.cls?'<span class="'+exp.cls+'" style="font-size:10px;padding:2px 8px;">'+exp.text+'</span>':'')+
+          '</div>'+
+          '<div class="ci-id">Client ID: '+esc(u.userId)+'</div>'+
           '<div class="ci-stats">'+
-            '<span class="ci-stat">👁 Views: <em>'+(u.views||0)+'</em></span>'+
-            '<span class="ci-stat">🔑 Logins: <em>'+(u.loginCount||0)+'</em></span>'+
+            '<span class="ci-stat">👁 <em>'+(u.views||0)+'</em> Views</span>'+
+            '<span class="ci-stat">🔑 <em>'+(u.loginCount||0)+'</em> Logins</span>'+
             '<span class="ci-stat">🕐 Last: <em>'+lastLogin+'</em></span>'+
           '</div>'+
+          (u.note?'<div style="font-size:11px;color:var(--txt-3);margin-top:3px;">📝 '+esc(u.note)+'</div>':'')+
         '</div>'+
-        '<div class="ci-actions">'+
-          (exp.cls?'<span class="'+exp.cls+'" style="font-size:10px;padding:3px 8px;">'+exp.text+'</span>':'<span style="font-size:11px;color:var(--txt-3);">No expiry</span>')+
-          '<button class="act-btn" style="padding:6px 10px;font-size:11px;" onclick="openActivity(\''+u.id+'\')">📊</button>'+
-          '<label class="tog"><input type="checkbox" '+(u.active?'checked':'')+'onchange="toggleClient(\''+u.id+'\',this.checked)"/><div class="tog-track"></div></label>'+
-          '<button class="btn-xs edit" onclick="toggleClientEdit(\''+u.id+'\')">✏</button>'+
-          '<button class="btn-xs del" onclick="delClient(\''+u.id+'\')">🗑</button>'+
-        '</div>'+
+      '</div>'+
+      '<div style="display:flex;gap:6px;padding:10px 15px;border-top:1px solid var(--border);flex-wrap:wrap;">'+
+        '<button class="act-btn" style="flex:1;justify-content:center;color:var(--info);border-color:rgba(75,159,255,0.2);background:var(--info-dim);font-size:12px;" onclick="toggleClientEdit(\''+u.id+'\')">✏️ Edit</button>'+
+        '<button class="act-btn" style="flex:1;justify-content:center;font-size:12px;" onclick="openActivity(\''+u.id+'\')">📊 Activity</button>'+
+        '<button class="act-btn" style="flex:1;justify-content:center;font-size:12px;'+(isActive?'color:var(--warn);border-color:rgba(245,158,11,0.2);background:var(--warn-dim);':'color:var(--ok);border-color:rgba(31,209,122,0.2);background:var(--ok-dim);')+'" onclick="toggleClient(\''+u.id+'\','+(isActive?'false':'true')+')">'+(isActive?'⏸ Disable':'▶ Enable')+'</button>'+
+        '<button class="act-btn del" style="flex:1;justify-content:center;font-size:12px;" onclick="delClient(\''+u.id+'\')">🗑 Remove</button>'+
       '</div>'+
       '<div class="ci-edit-panel" id="cep-'+u.id+'">'+
         '<div class="edit-row">'+
           '<div class="fg"><label class="fl">Full Name</label><input class="fi" id="efn-'+u.id+'" value="'+esc(u.fullName||'')+'"/></div>'+
+          '<div class="fg"><label class="fl">Client ID</label><input class="fi" id="euid-'+u.id+'" value="'+esc(u.userId||'')+'" placeholder="Client ID"/></div>'+
+        '</div>'+
+        '<div class="edit-row">'+
           '<div class="fg"><label class="fl">New Password</label>'+
             '<div class="fi-wrap"><input class="fi" id="epw-'+u.id+'" type="password" placeholder="Leave blank to keep"/>'+
             '<button class="eye-btn" onclick="tEye(\'epw-'+u.id+'\',this)">👁</button></div></div>'+
-        '</div>'+
-        '<div class="edit-row">'+
           '<div class="fg"><label class="fl">Expiry Date</label><input class="fi" id="eexp-'+u.id+'" type="date" value="'+eVal+'"/></div>'+
-          '<div class="fg"><label class="fl">Subscription Note</label><input class="fi" id="enote-'+u.id+'" value="'+esc(u.note||'')+'" placeholder="Optional note"/></div>'+
         '</div>'+
+        '<div class="fg" style="margin-bottom:10px;"><label class="fl">Note</label><input class="fi" id="enote-'+u.id+'" value="'+esc(u.note||'')+'" placeholder="Subscription note (optional)"/></div>'+
         '<div class="edit-btns">'+
-          '<button class="btn-xs save" onclick="saveClientEdit(\''+u.id+'\')">💾 Save</button>'+
+          '<button class="btn-xs save" onclick="saveClientEdit(\''+u.id+'\')">💾 Save Changes</button>'+
           '<button class="btn-xs" onclick="toggleClientEdit(\''+u.id+'\')">Cancel</button>'+
         '</div>'+
       '</div>'+
@@ -1051,8 +1220,14 @@ async function saveClientEdit(uid2){
   var f=find(activeDocId);if(!f)return;
   var newPw=document.getElementById("epw-"+uid2).value;
   var newExp=document.getElementById("eexp-"+uid2).value;
-  var newFn=document.getElementById("efn-"+uid2).value.trim();
-  var newNote=document.getElementById("enote-"+uid2).value.trim();
+  var newFn=(document.getElementById("efn-"+uid2).value||"").trim();
+  var newUid=(document.getElementById("euid-"+uid2).value||"").trim();
+  var newNote=(document.getElementById("enote-"+uid2).value||"").trim();
+  // Check duplicate ID if changed
+  if(newUid){
+    var dup=(f.passwords||[]).find(function(u){return u.userId===newUid&&u.id!==uid2;});
+    if(dup){toast("Client ID '"+newUid+"' already exists","err");return;}
+  }
   try{
     var masterKey=null;
     if(newPw&&newPw.length>=4)masterKey=await unsealMK(f.masterKeySeal,auth.currentUser.uid);
@@ -1061,13 +1236,15 @@ async function saveClientEdit(uid2){
       var up=Object.assign({},u);
       if(newPw&&newPw.length>=4){var salt=rSalt();up.salt=salt;up.wrappedMasterKey=await wrapMK(masterKey,newPw,salt);}
       if(newFn)up.fullName=newFn;
-      if(newNote!==undefined)up.note=newNote;
+      if(newUid)up.userId=newUid;
+      up.note=newNote;
       up.expiresAt=newExp?new Date(newExp+"T23:59:59").getTime():null;
       return up;
     }));
     await db.collection("links").doc(activeDocId).update({passwords:pws});
-    f.passwords=pws;renderClientList();renderLinks(allLinks);
-    toast("Changes saved","ok");
+    f.passwords=pws;
+    renderClientList();renderLinks(allLinks);
+    toast("Client updated successfully","ok");
   }catch(e){toast(e.message,"err");}
 }
 
@@ -1140,8 +1317,28 @@ function loadSettingsUI(){
   document.getElementById("ss-pid").value=CFG.firebase.projectId||"";
   document.getElementById("ss-ad").value=CFG.firebase.authDomain||"";
   document.getElementById("ss-url").value=CFG.appUrl||"";
+  // Load saved master pw hint
+  var saved=localStorage.getItem("ss_masterPw_set");
+  var st=document.getElementById("ss-masterStatus");
+  if(saved){st.style.display="block";st.innerHTML='<span style="color:var(--ok);">✓ Master password is set. Enter new password to change.</span>';}
 }
-function saveSettings(){CFG.appUrl=g("ss-url");toast("Settings saved","ok");}
+function saveSettings(){
+  CFG.appUrl=g("ss-url");
+  var mp=document.getElementById("ss-masterPw").value;
+  var st=document.getElementById("ss-masterStatus");
+  if(mp&&mp.length>=4){
+    localStorage.setItem("ss_masterPw",mp);
+    localStorage.setItem("ss_masterPw_set","1");
+    st.style.display="block";
+    st.innerHTML='<span style="color:var(--ok);">✓ Master password saved.</span>';
+    document.getElementById("ss-masterPw").value="";
+    toast("Settings saved. Master password updated.","ok");
+  }else if(mp&&mp.length<4){
+    toast("Master password must be at least 4 characters","err");
+  }else{
+    toast("Settings saved","ok");
+  }
+}
 
 /* ═══════════════════════ CLIENT VIEW ═══════════════════════ */
 async function cvStart(id){
