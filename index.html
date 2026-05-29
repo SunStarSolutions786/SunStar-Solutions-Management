@@ -483,7 +483,7 @@ button{font-family:'DM Sans',sans-serif;cursor:pointer;}
         <div class="stat-card" style="--accent-color:var(--info)">
           <div class="stat-icon">👁</div>
           <div class="stat-val" style="color:var(--info)" id="st-views">0</div>
-          <div class="stat-lbl">Total Views</div>
+          <div class="stat-lbl">Link Opens</div>
         </div>
         <div class="stat-card" style="--accent-color:#a78bfa">
           <div class="stat-icon">👥</div>
@@ -943,7 +943,7 @@ function renderLinks(links){
       if(!u.expiresAt)return false;
       return new Date(u.expiresAt)<new Date();
     }).length;
-    var totalViews=clients.reduce(function(s,u){return s+(u.views||0);},0);
+    var totalLogins=clients.reduce(function(s,u){return s+(u.loginCount||0);},0);
     return '<div class="link-card">'+
       '<div class="lc-main">'+
         '<div class="lc-icon">📄</div>'+
@@ -952,8 +952,8 @@ function renderLinks(links){
           '<div class="lc-meta">'+
             '<span>'+formatDate(f.createdAt)+'</span>'+
             '<span>'+formatSize(f.size||0)+'</span>'+
-            '<span>👁 '+(f.visitCount||0)+' visits</span>'+
-            '<span>🔑 '+totalViews+' login'+(totalViews!==1?'s':'')+'</span>'+
+            '<span>👁 '+(f.visitCount||0)+' opened</span>'+
+            '<span>🔑 '+totalLogins+' logged in</span>'+
           '</div>'+
         '</div>'+
         '<div class="lc-right">'+
@@ -981,9 +981,9 @@ function filterLinks(){
 
 function updateStats(){
   var active=allLinks.filter(function(f){return f.active;}).length;
-  var views=allLinks.reduce(function(s,f){return s+(f.views||0);},0);
+  var visits=allLinks.reduce(function(s,f){return s+(f.visitCount||0);},0);
   var clients=allLinks.reduce(function(s,f){return s+((f.passwords||[]).filter(function(u){return u.active;}).length);},0);
-  svn("st-total",allLinks.length);svn("st-active",active);svn("st-views",views);svn("st-clients",clients);
+  svn("st-total",allLinks.length);svn("st-active",active);svn("st-views",visits);svn("st-clients",clients);
 }
 
 async function toggleLink(id,val){
@@ -1242,8 +1242,8 @@ function renderClientList(){
           '</div>'+
           '<div class="ci-id">Client ID: '+esc(u.userId)+'</div>'+
           '<div class="ci-stats">'+
-            '<span class="ci-stat">👁 <em>'+(u.views||0)+'</em> Views</span>'+
-            '<span class="ci-stat">🔑 <em>'+(u.loginCount||0)+'</em> Logins</span>'+
+            '<span class="ci-stat">🔑 <em>'+(u.loginCount||0)+'</em> Login'+(( u.loginCount||0)!==1?'s':'')+'</span>'+
+            '<span class="ci-stat">⛔ <em>'+((u.activityLog||[]).filter(function(e){return e.type==='fail';}).length||u.failedAttempts||0)+'</em> Failed</span>'+
             '<span class="ci-stat">🕐 Last: <em>'+lastLogin+'</em></span>'+
           '</div>'+
           (u.note?'<div style="font-size:11px;color:var(--txt-3);margin-top:3px;">📝 '+esc(u.note)+'</div>':'')+
@@ -1614,17 +1614,22 @@ async function cvLogin(){
 
     // ── Track failed login attempt ──
     if(!userRec){
-      // Find the user even if inactive/expired to log attempt
-      var anyRec=(cd.data.passwords||[]).find(function(u){return u.userId===userId;});
+      var anyRec=(cd.data.passwords||[]).find(function(u){
+        return u.userId===userId; // any matching user — active or not
+      });
       if(anyRec){
         var failEntry={type:'fail',time:Date.now(),device:device};
         var failPws=(cd.data.passwords||[]).map(function(u){
           if(u.id!==anyRec.id)return u;
           var log=(u.activityLog||[]).concat([failEntry]).slice(-100);
-          return Object.assign({},u,{failedAttempts:(u.failedAttempts||0)+1,activityLog:log});
+          return Object.assign({},u,{
+            failedAttempts:(u.failedAttempts||0)+1,
+            activityLog:log
+          });
         });
-        cd.db.collection("links").doc(cd.id).update({passwords:failPws}).catch(function(){});
-        cd.data.passwords=failPws;
+        cd.db.collection("links").doc(cd.id).update({passwords:failPws})
+          .then(function(){cd.data.passwords=failPws;})
+          .catch(function(e){console.log("fail track err",e);});
       }
       if(expiredRec){cvShowState("expired");return;}
       throw new Error("invalid");
