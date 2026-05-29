@@ -894,7 +894,10 @@ async function doReg(){
   try{await auth.createUserWithEmailAndPassword(em,pw);toast("Admin account created!","ok");}
   catch(e){toast(e.message,"err");}
 }
-async function doLogout(){try{await auth.signOut();}catch(e){}}
+async function doLogout(){
+  if(_linksUnsub){_linksUnsub();_linksUnsub=null;}
+  try{await auth.signOut();}catch(e){}
+}
 
 /* ═══════════════════════ APP ═══════════════════════ */
 function showApp(u){
@@ -906,12 +909,20 @@ function showApp(u){
 }
 
 /* ═══════════════════════ LINKS ═══════════════════════ */
+var _linksUnsub=null;
 async function loadLinks(){
+  if(_linksUnsub)_linksUnsub(); // cleanup old listener
   try{
     var uid=auth.currentUser.uid;
-    var snap=await db.collection("links").where("uid","==",uid).orderBy("createdAt","desc").get();
-    allLinks=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
-    renderLinks(allLinks);updateStats();
+    // ── Realtime listener — auto-updates when client logs in ──
+    _linksUnsub=db.collection("links")
+      .where("uid","==",uid)
+      .orderBy("createdAt","desc")
+      .onSnapshot(function(snap){
+        allLinks=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+        renderLinks(allLinks);
+        updateStats();
+      },function(e){toast("Sync error: "+e.message,"err");});
   }catch(e){toast("Load error: "+e.message,"err");}
 }
 
@@ -1370,9 +1381,21 @@ function fmtDur(sec){
 
 function openActivity(uid2){
   if(!activeDocId)return;
-  var f=find(activeDocId);if(!f)return;
-  var u=find2(f,uid2);if(!u)return;
-  actClientData={docId:activeDocId,userId:uid2};
+  // ── Always fetch fresh data from Firestore ──
+  db.collection("links").doc(activeDocId).get().then(function(doc){
+    if(!doc.exists)return;
+    var f=Object.assign({id:doc.id},doc.data());
+    // Update local cache too
+    var idx=allLinks.findIndex(function(x){return x.id===activeDocId;});
+    if(idx>=0)allLinks[idx]=f;
+    var u=(f.passwords||[]).find(function(u){return u.id===uid2;});
+    if(!u)return;
+    _renderActivity(f,u);
+    document.getElementById("act-ov").classList.add("on");
+  }).catch(function(e){toast("Error: "+e.message,"err");});
+}
+
+function _renderActivity(f,u){
 
   document.getElementById("act-client-name").textContent=(u.fullName||u.userId)+' · ID: '+u.userId;
 
@@ -1468,9 +1491,8 @@ function openActivity(uid2){
       '</div>';
     }).join('');
   }
-
-  document.getElementById("act-ov").classList.add("on");
 }
+
 function closeActivity(){document.getElementById("act-ov").classList.remove("on");actClientData=null;}
 
 /* ═══════════════════════ SETTINGS ═══════════════════════ */
