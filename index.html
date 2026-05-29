@@ -1397,39 +1397,74 @@ function openActivity(uid2){
     '<div class="act-stat"><div class="act-stat-val" style="color:'+(exp.status==='expired'?'var(--err)':exp.status==='soon'?'var(--warn)':'var(--gold)')+'">'+
       (daysLeft===null?'∞':daysLeft)+'</div><div class="act-stat-lbl">Days Left</div></div>';
 
-  // ── Activity log ──
-  var entries=[].concat(log);
-  if(!entries.length){
+  // ── Activity log — pair login+logout into sessions ──
+  var raw=[].concat(log).sort(function(a,b){return a.time-b.time;});
+  var sessions=[];
+  var openLogin=null;
+
+  raw.forEach(function(e){
+    if(e.type==='login'){
+      openLogin={loginTime:e.time,device:e.device};
+    }else if(e.type==='logout'&&openLogin){
+      sessions.push({
+        type:'session',
+        from:openLogin.loginTime,
+        to:e.time,
+        dur:e.sessionSec||(Math.round((e.time-openLogin.loginTime)/1000)),
+        device:openLogin.device||e.device
+      });
+      openLogin=null;
+    }else if(e.type==='fail'){
+      sessions.push({type:'fail',time:e.time,device:e.device});
+    }
+  });
+
+  // Open session (logged in, never logged out)
+  if(openLogin){
+    sessions.push({
+      type:'session',
+      from:openLogin.loginTime,
+      to:null, // still active
+      dur:Math.round((Date.now()-openLogin.loginTime)/1000),
+      device:openLogin.device,
+      active:true
+    });
+  }
+
+  sessions.sort(function(a,b){return (b.from||b.time)-(a.from||a.time);});
+
+  if(!sessions.length){
     document.getElementById("act-log").innerHTML=
       '<div style="text-align:center;padding:28px;color:var(--txt-3);font-size:13px;">No activity recorded yet.</div>';
   }else{
-    entries.sort(function(a,b){return b.time-a.time;});
-    document.getElementById("act-log").innerHTML=entries.slice(0,50).map(function(e){
-      var ico,title,color,extra='';
-      if(e.type==='login'){
-        ico='🔑';title='Logged In';color='var(--ok)';
-        // Check if this login has no subsequent logout (ongoing session)
-        var loginIdx=entries.indexOf(e);
-        var hasLogout=entries.slice(0,loginIdx).some(function(x){return x.type==='logout'&&x.time>e.time;});
-        if(!hasLogout&&isOnline){
-          var ongoingSec=Math.round((Date.now()-e.time)/1000);
-          extra='<span style="font-size:10px;color:var(--ok);margin-left:6px;background:var(--ok-dim);padding:2px 7px;border-radius:10px;">🟢 Active · '+fmtDur(ongoingSec)+'</span>';
-        }
-      }else if(e.type==='logout'){
-        ico='🚪';title='Session Ended';color='var(--txt-2)';
-        if(e.sessionSec)extra='<span style="font-size:10px;color:var(--info);margin-left:6px;background:var(--info-dim);padding:2px 7px;border-radius:10px;">⏱ '+fmtDur(e.sessionSec)+'</span>';
-      }else if(e.type==='fail'){
-        ico='⛔';title='Failed Attempt';color='var(--err)';
-      }else{
-        ico='📌';title='Event';color='var(--txt-2)';
+    document.getElementById("act-log").innerHTML=sessions.map(function(s){
+      if(s.type==='fail'){
+        return '<div class="act-row">'+
+          '<div class="act-row-ico">⛔</div>'+
+          '<div class="act-row-info">'+
+            '<div class="act-row-title" style="color:var(--err)">Failed Login Attempt</div>'+
+            '<div class="act-row-meta">'+(s.device||'Unknown device')+'</div>'+
+          '</div>'+
+          '<div class="act-row-time">'+fmtTime(s.time)+'</div>'+
+        '</div>';
       }
-      return '<div class="act-row">'+
-        '<div class="act-row-ico">'+ico+'</div>'+
-        '<div class="act-row-info">'+
-          '<div class="act-row-title" style="color:'+color+'">'+title+extra+'</div>'+
-          '<div class="act-row-meta">'+(e.device||'Unknown device')+'</div>'+
+      // Session row
+      var fromStr=fmtTime(s.from);
+      var toStr=s.active?
+        '<span style="color:var(--ok);font-weight:700;">Active Now</span>':
+        fmtTime(s.to);
+      var durBadge='<span style="font-size:10px;padding:2px 8px;border-radius:10px;margin-left:6px;'+(s.active?'background:var(--ok-dim);color:var(--ok);':'background:var(--info-dim);color:var(--info);')+'">⏱ '+fmtDur(s.dur)+'</span>';
+      return '<div class="act-row" style="'+(s.active?'border-color:rgba(31,209,122,0.25);background:rgba(31,209,122,0.04);':'')+'">'+
+        '<div class="act-row-ico">'+(s.active?'🟢':'🕐')+'</div>'+
+        '<div class="act-row-info" style="flex:1;min-width:0;">'+
+          '<div style="display:flex;align-items:center;flex-wrap:wrap;gap:4px;">'+
+            '<span style="font-size:13px;font-weight:600;color:var(--txt);">'+fromStr+'</span>'+
+            '<span style="color:var(--txt-3);font-size:12px;">→</span>'+
+            '<span style="font-size:13px;font-weight:600;">'+toStr+'</span>'+
+            durBadge+
+          '</div>'+
+          '<div class="act-row-meta" style="margin-top:3px;">'+(s.device||'Unknown device')+'</div>'+
         '</div>'+
-        '<div class="act-row-time" style="text-align:right;">'+fmtTime(e.time)+'</div>'+
       '</div>';
     }).join('');
   }
