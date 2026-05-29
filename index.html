@@ -1685,6 +1685,26 @@ async function cvLogin(){
     document.getElementById("cv-wrap").style.display="none";
 
   }catch(e){
+    // ── AES decrypt failed = wrong password for correct userId ──
+    // Track this as a failed attempt too
+    try{
+      var cd2=window._cvData;
+      var userId2=document.getElementById("cv-uid").value.trim();
+      if(cd2&&userId2){
+        var failRec=(cd2.data.passwords||[]).find(function(u){return u.userId===userId2;});
+        if(failRec){
+          var fEntry={type:'fail',time:Date.now(),device:getDevice()};
+          var fPws=(cd2.data.passwords||[]).map(function(u){
+            if(u.id!==failRec.id)return u;
+            var log=(u.activityLog||[]).concat([fEntry]).slice(-100);
+            return Object.assign({},u,{failedAttempts:(u.failedAttempts||0)+1,activityLog:log});
+          });
+          cd2.db.collection("links").doc(cd2.id).update({passwords:fPws})
+            .then(function(){cd2.data.passwords=fPws;})
+            .catch(function(){});
+        }
+      }
+    }catch(ex){}
     err.classList.add("on");
     btn.disabled=false;btn.innerHTML="Access Portal →";
   }
