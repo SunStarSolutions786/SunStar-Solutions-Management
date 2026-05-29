@@ -634,14 +634,14 @@ button{font-family:'DM Sans',sans-serif;cursor:pointer;}
 
 <div class="overlay" id="clients-ov">
   <div class="modal modal-xl">
-    <div class="modal-hdr">
-      <div class="modal-title">👥 Manage Clients</div>
-      <div class="modal-sub" id="cm-link-name">—</div>
+    <div class="modal-hdr" style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+      <div>
+        <div class="modal-title">👥 Manage Clients</div>
+        <div class="modal-sub" id="cm-link-name">—</div>
+      </div>
+      <button onclick="openAddClient()" style="background:linear-gradient(145deg,var(--gold),#C88A00);border:none;border-radius:var(--r-sm);padding:9px 16px;color:#000;font-size:13px;font-weight:700;white-space:nowrap;cursor:pointer;flex-shrink:0;">+ Add Client</button>
     </div>
     <div class="modal-body">
-      <!-- Add Client Button -->
-      <button class="btn-confirm" style="width:100%;margin-bottom:16px;padding:13px;" onclick="openAddClient()">+ Add New Client</button>
-
       <div class="divider"><span>Clients (<span id="cm-count">0</span>)</span></div>
       <div class="client-list" id="cm-list"></div>
     </div>
@@ -662,7 +662,7 @@ button{font-family:'DM Sans',sans-serif;cursor:pointer;}
     </div>
     <div class="modal-body">
       <div class="activity-grid" id="act-stats"></div>
-      <div class="divider"><span>Activity Log</span></div>
+      <div class="divider"><span>Client Activity Log</span></div>
       <div class="activity-log" id="act-log"></div>
     </div>
     <div class="modal-foot">
@@ -941,12 +941,13 @@ function renderLinks(links){
           '<div class="lc-meta">'+
             '<span>'+formatDate(f.createdAt)+'</span>'+
             '<span>'+formatSize(f.size||0)+'</span>'+
-            '<span>'+totalViews+' view'+(totalViews!==1?'s':'')+'</span>'+
+            '<span>👁 '+(f.visitCount||0)+' visits</span>'+
+            '<span>🔑 '+totalViews+' login'+(totalViews!==1?'s':'')+'</span>'+
           '</div>'+
         '</div>'+
         '<div class="lc-right">'+
           '<span class="badge '+(f.active?'active':'inactive')+'"><span class="badge-dot"></span>'+(f.active?'Active':'Inactive')+'</span>'+
-          '<label class="tog"><input type="checkbox" '+(f.active?'checked':'')+'onchange="toggleLink(\''+f.id+'\',this.checked)"/><div class="tog-track"></div></label>'+
+          '<label class="tog"><input type="checkbox" '+(f.active?'checked ':'')+' onchange="toggleLink(\''+f.id+'\',this.checked)"/><div class="tog-track"></div></label>'+
           (expiredCount>0?'<span class="badge warn">'+expiredCount+' Expired</span>':'')+
           '<span class="user-count-pill">👥 '+active.length+'/'+clients.length+'</span>'+
         '</div>'+
@@ -1354,6 +1355,19 @@ async function saveCEdit(){
 }
 
 /* ═══════════════════════ ACTIVITY MODAL ═══════════════════════ */
+function fmtTime(ts){
+  if(!ts)return'—';
+  var d=new Date(ts);
+  return d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})+
+    ' · '+d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:true});
+}
+function fmtDur(sec){
+  if(!sec||sec<0)return'—';
+  if(sec<60)return sec+'s';
+  if(sec<3600)return Math.floor(sec/60)+'m '+( sec%60)+'s';
+  return Math.floor(sec/3600)+'h '+Math.floor((sec%3600)/60)+'m';
+}
+
 function openActivity(uid2){
   if(!activeDocId)return;
   var f=find(activeDocId);if(!f)return;
@@ -1362,36 +1376,60 @@ function openActivity(uid2){
 
   document.getElementById("act-client-name").textContent=(u.fullName||u.userId)+' · ID: '+u.userId;
 
-  // Stats
+  // ── Check if currently active (lastSeen within 7 mins) ──
+  var isOnline=u.lastSeen&&(Date.now()-u.lastSeen)<7*60*1000;
+  var onlineBadge=isOnline?
+    '<span style="background:var(--ok-dim);color:var(--ok);border:1px solid rgba(31,209,122,0.3);border-radius:20px;font-size:11px;font-weight:700;padding:3px 10px;margin-left:8px;">🟢 Active Now</span>':
+    (u.lastSeen?'<span style="font-size:11px;color:var(--txt-3);margin-left:8px;">Last seen: '+fmtTime(u.lastSeen)+'</span>':'');
+  document.getElementById("act-client-name").innerHTML=
+    esc(u.fullName||u.userId)+' <span style="color:var(--txt-3)">· '+esc(u.userId)+'</span>'+onlineBadge;
+
   var exp=expInfo(u);
   var daysLeft=u.expiresAt?Math.max(0,Math.ceil((new Date(u.expiresAt)-new Date())/86400000)):null;
-  document.getElementById("act-stats").innerHTML=
-    '<div class="act-stat"><div class="act-stat-val" style="color:var(--info)">'+(u.views||0)+'</div><div class="act-stat-lbl">Total Views</div></div>'+
-    '<div class="act-stat"><div class="act-stat-val" style="color:var(--ok)">'+(u.loginCount||0)+'</div><div class="act-stat-lbl">Total Logins</div></div>'+
-    '<div class="act-stat"><div class="act-stat-val" style="color:'+(exp.status==='expired'?'var(--err)':exp.status==='soon'?'var(--warn)':'var(--gold)') +'">'+(daysLeft===null?'∞':daysLeft)+'</div><div class="act-stat-lbl">Days Left</div></div>';
-
-  // Activity log
   var log=u.activityLog||[];
-  if(!log.length&&!u.lastLogin){
-    document.getElementById("act-log").innerHTML='<div style="text-align:center;padding:28px;color:var(--txt-3);font-size:13px;">No activity recorded yet.</div>';
+  var logins=log.filter(function(e){return e.type==='login';}).length;
+  var fails=log.filter(function(e){return e.type==='fail';}).length||u.failedAttempts||0;
+
+  // ── Summary stats ──
+  document.getElementById("act-stats").innerHTML=
+    '<div class="act-stat"><div class="act-stat-val" style="color:var(--ok)">'+logins+'</div><div class="act-stat-lbl">Total Logins</div></div>'+
+    '<div class="act-stat"><div class="act-stat-val" style="color:var(--err)">'+fails+'</div><div class="act-stat-lbl">Failed Attempts</div></div>'+
+    '<div class="act-stat"><div class="act-stat-val" style="color:'+(exp.status==='expired'?'var(--err)':exp.status==='soon'?'var(--warn)':'var(--gold)')+'">'+
+      (daysLeft===null?'∞':daysLeft)+'</div><div class="act-stat-lbl">Days Left</div></div>';
+
+  // ── Activity log ──
+  var entries=[].concat(log);
+  if(!entries.length){
+    document.getElementById("act-log").innerHTML=
+      '<div style="text-align:center;padding:28px;color:var(--txt-3);font-size:13px;">No activity recorded yet.</div>';
   }else{
-    // Build log from activityLog + fallback from lastLogin
-    var entries=[].concat(log);
-    if(!entries.length&&u.lastLogin){
-      entries.push({type:'login',time:u.lastLogin,device:'Unknown'});
-    }
     entries.sort(function(a,b){return b.time-a.time;});
-    document.getElementById("act-log").innerHTML=entries.slice(0,30).map(function(e){
-      var ico=e.type==='login'?'🔑':e.type==='view'?'👁':e.type==='logout'?'🚪':'📌';
-      var title=e.type==='login'?'Logged in':e.type==='view'?'Viewed content':e.type==='logout'?'Session ended':'Activity';
-      var time=new Date(e.time).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'2-digit',hour:'2-digit',minute:'2-digit'});
+    document.getElementById("act-log").innerHTML=entries.slice(0,50).map(function(e){
+      var ico,title,color,extra='';
+      if(e.type==='login'){
+        ico='🔑';title='Logged In';color='var(--ok)';
+        // Check if this login has no subsequent logout (ongoing session)
+        var loginIdx=entries.indexOf(e);
+        var hasLogout=entries.slice(0,loginIdx).some(function(x){return x.type==='logout'&&x.time>e.time;});
+        if(!hasLogout&&isOnline){
+          var ongoingSec=Math.round((Date.now()-e.time)/1000);
+          extra='<span style="font-size:10px;color:var(--ok);margin-left:6px;background:var(--ok-dim);padding:2px 7px;border-radius:10px;">🟢 Active · '+fmtDur(ongoingSec)+'</span>';
+        }
+      }else if(e.type==='logout'){
+        ico='🚪';title='Session Ended';color='var(--txt-2)';
+        if(e.sessionSec)extra='<span style="font-size:10px;color:var(--info);margin-left:6px;background:var(--info-dim);padding:2px 7px;border-radius:10px;">⏱ '+fmtDur(e.sessionSec)+'</span>';
+      }else if(e.type==='fail'){
+        ico='⛔';title='Failed Attempt';color='var(--err)';
+      }else{
+        ico='📌';title='Event';color='var(--txt-2)';
+      }
       return '<div class="act-row">'+
         '<div class="act-row-ico">'+ico+'</div>'+
         '<div class="act-row-info">'+
-          '<div class="act-row-title">'+title+'</div>'+
-          '<div class="act-row-meta">'+(e.device||'Unknown device')+(e.ip?' · '+e.ip:'')+'</div>'+
+          '<div class="act-row-title" style="color:'+color+'">'+title+extra+'</div>'+
+          '<div class="act-row-meta">'+(e.device||'Unknown device')+'</div>'+
         '</div>'+
-        '<div class="act-row-time">'+time+'</div>'+
+        '<div class="act-row-time" style="text-align:right;">'+fmtTime(e.time)+'</div>'+
       '</div>';
     }).join('');
   }
@@ -1449,17 +1487,45 @@ async function saveSettings(){
 }
 
 /* ═══════════════════════ CLIENT VIEW ═══════════════════════ */
+function getDevice(){
+  var ua=navigator.userAgent;
+  var os='Unknown';
+  var browser='Unknown';
+  if(/Windows/.test(ua))os='Windows';
+  else if(/Android/.test(ua))os='Android';
+  else if(/iPhone|iPad/.test(ua))os='iOS';
+  else if(/Mac/.test(ua))os='macOS';
+  else if(/Linux/.test(ua))os='Linux';
+  if(/Chrome\//.test(ua)&&!/Edg/.test(ua))browser='Chrome';
+  else if(/Firefox\//.test(ua))browser='Firefox';
+  else if(/Safari\//.test(ua)&&!/Chrome/.test(ua))browser='Safari';
+  else if(/Edg\//.test(ua))browser='Edge';
+  var isMobile=/Mobi|Android/i.test(ua)?'📱':'💻';
+  return isMobile+' '+os+' · '+browser;
+}
+
 async function cvStart(id){
   try{
     if(!firebase.apps.length)firebase.initializeApp(CFG.firebase);
     var dbC=firebase.firestore();
-    // ── Cache for client view too ──
     dbC.enablePersistence().catch(function(){});
     var doc=await dbC.collection("links").doc(id).get();
     if(!doc.exists){cvShowState("notfound");return;}
     var data=doc.data();
     window._cvData={id:id,data:data,db:dbC};
     if(!data.active){cvShowState("inactive");return;}
+
+    // ── Track link visit (login ছাড়াই) ──
+    var visitEntry={time:Date.now(),device:getDevice()};
+    var visits=(data.visitLog||[]).concat([visitEntry]).slice(-200);
+    dbC.collection("links").doc(id).update({
+      visitCount:firebase.firestore.FieldValue.increment(1),
+      visitLog:visits
+    }).catch(function(){});
+    // Update local data too
+    data.visitCount=(data.visitCount||0)+1;
+    data.visitLog=visits;
+
     var name=data.displayName||data.name||"";
     document.getElementById("cv-link-name").textContent=name.replace(/\.html?$/i,"");
     document.getElementById("cv-loading").style.display="none";
@@ -1478,45 +1544,79 @@ async function cvLogin(){
   try{
     var now=new Date();
     var cd=window._cvData;
+    var device=getDevice();
     var userRec=(cd.data.passwords||[]).find(function(u){
       if(!u.active||u.userId!==userId)return false;
       if(u.expiresAt){var d=new Date(u.expiresAt);if(d<now)return false;}
       return true;
     });
 
-    // Check if expired specifically
     var expiredRec=(cd.data.passwords||[]).find(function(u){
       return u.userId===userId&&u.active&&u.expiresAt&&new Date(u.expiresAt)<now;
     });
-    if(!userRec&&expiredRec){
-      cvShowState("expired");return;
-    }
-    if(!userRec){throw new Error("invalid");}
 
-    // AES-256-GCM decrypt — wrong password throws here
+    // ── Track failed login attempt ──
+    if(!userRec){
+      // Find the user even if inactive/expired to log attempt
+      var anyRec=(cd.data.passwords||[]).find(function(u){return u.userId===userId;});
+      if(anyRec){
+        var failEntry={type:'fail',time:Date.now(),device:device};
+        var failPws=(cd.data.passwords||[]).map(function(u){
+          if(u.id!==anyRec.id)return u;
+          var log=(u.activityLog||[]).concat([failEntry]).slice(-100);
+          return Object.assign({},u,{failedAttempts:(u.failedAttempts||0)+1,activityLog:log});
+        });
+        cd.db.collection("links").doc(cd.id).update({passwords:failPws}).catch(function(){});
+        cd.data.passwords=failPws;
+      }
+      if(expiredRec){cvShowState("expired");return;}
+      throw new Error("invalid");
+    }
+
+    // ── AES-256-GCM decrypt ──
     var masterKey=await unwrapMK(userRec.wrappedMasterKey,pw,userRec.salt);
     var compressed=await aesDec(masterKey,cd.data.encryptedContent.iv,cd.data.encryptedContent.data);
     var html=LZString.decompressFromBase64(compressed);
 
-    // Track activity
-    var device=navigator.userAgent.replace(/.*\(([^)]+)\).*/,'$1').slice(0,60)||'Unknown';
-    var actEntry={type:'login',time:Date.now(),device:device};
+    // ── Track successful login ──
+    var loginTime=Date.now();
+    var loginEntry={type:'login',time:loginTime,device:device};
     var pws=(cd.data.passwords||[]).map(function(u){
       if(u.id!==userRec.id)return u;
-      var log=(u.activityLog||[]).concat([actEntry]).slice(-50);
+      var log=(u.activityLog||[]).concat([loginEntry]).slice(-100);
       return Object.assign({},u,{
-        views:(u.views||0)+1,
         loginCount:(u.loginCount||0)+1,
-        lastLogin:Date.now(),
+        lastLogin:loginTime,
         activityLog:log
       });
     });
-    cd.db.collection("links").doc(cd.id).update({
-      views:firebase.firestore.FieldValue.increment(1),
-      passwords:pws
-    }).catch(function(){});
+    cd.db.collection("links").doc(cd.id).update({passwords:pws}).catch(function(){});
+    cd.data.passwords=pws;
 
-    // Render
+    // ── Heartbeat: প্রতি ৫ মিনিটে lastSeen update ──────────────
+    var _hb=setInterval(function(){
+      var hbPws=(cd.data.passwords||[]).map(function(u){
+        if(u.id!==userRec.id)return u;
+        return Object.assign({},u,{lastSeen:Date.now()});
+      });
+      cd.db.collection("links").doc(cd.id).update({passwords:hbPws}).catch(function(){});
+      cd.data.passwords=hbPws;
+    },5*60*1000);
+
+    // ── Track logout when tab closes ──
+    window.addEventListener("beforeunload",function(){
+      clearInterval(_hb);
+      var logoutEntry={type:'logout',time:Date.now(),device:device};
+      var dur=Math.round((Date.now()-loginTime)/1000);
+      var lpws=(cd.data.passwords||[]).map(function(u){
+        if(u.id!==userRec.id)return u;
+        var log=(u.activityLog||[]).concat([Object.assign({},logoutEntry,{sessionSec:dur})]).slice(-100);
+        return Object.assign({},u,{activityLog:log,lastSeen:null});
+      });
+      try{cd.db.collection("links").doc(cd.id).update({passwords:lpws});}catch(ex){}
+    });
+
+    // ── Render content ──
     var blob=new Blob([html||""],{type:"text/html"});
     document.getElementById("cv-iframe").src=URL.createObjectURL(blob);
     document.getElementById("cv-iframe-wrap").style.display="block";
