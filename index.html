@@ -806,7 +806,12 @@ var auth,db,allLinks=[],fileToUp=null,activeDocId=null,actClientData=null,_toast
 })();
 
 /* ═══════════════════════ CRYPTO — AES-256-GCM + PBKDF2 ═══════════════════════ */
-function _b64(arr){return btoa(String.fromCharCode(...new Uint8Array(arr)));}
+function _b64(arr){
+  var u8=new Uint8Array(arr),s='',c=8192;
+  for(var i=0;i<u8.length;i+=c)
+    s+=String.fromCharCode.apply(null,u8.subarray(i,i+c));
+  return btoa(s);
+}
 function _arr(b64){return Uint8Array.from(atob(b64),function(c){return c.charCodeAt(0);});}
 async function deriveKey(pw,salt){
   var km=await crypto.subtle.importKey("raw",new TextEncoder().encode(pw),"PBKDF2",false,["deriveKey"]);
