@@ -348,13 +348,13 @@ button{font-family:'DM Sans',sans-serif;cursor:pointer;}
   <div class="cv-wrap" id="cv-wrap">
     <div class="cv-card">
       <!-- Loading -->
-      <div class="cv-loading" id="cv-loading">
+      <div class="cv-loading" id="cv-loading" style="display:none;">
         <div class="spn" style="width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 14px;"></div>
         <div class="cv-loading-txt">Verifying access...</div>
       </div>
 
       <!-- Login form -->
-      <div id="cv-loginform" style="display:none;">
+      <div id="cv-loginform" style="display:block;">
         <div class="cv-brand-row">
           <div class="cv-logo-icon">☀</div>
           <div class="cv-company">SunStar Solutions</div>
@@ -421,7 +421,6 @@ button{font-family:'DM Sans',sans-serif;cursor:pointer;}
       </div>
       <button class="btn-gold" id="a-btn" onclick="doLogin()">Sign In →</button>
       <div class="auth-err" id="a-err"></div>
-      <div class="auth-foot">No account? <a onclick="doReg()">Create admin account</a></div>
     </div>
   </div>
 </div>
@@ -1562,6 +1561,7 @@ function getDevice(){
 }
 
 async function cvStart(id){
+  // ── Form already visible — update link name when data loads ──
   try{
     if(!firebase.apps.length)firebase.initializeApp(CFG.firebase);
     var dbC=firebase.firestore();
@@ -1572,25 +1572,32 @@ async function cvStart(id){
     window._cvData={id:id,data:data,db:dbC};
     if(!data.active){cvShowState("inactive");return;}
 
-    // ── Track link visit (login ছাড়াই) ──
+    // Update link name
+    var name=data.displayName||data.name||"";
+    document.getElementById("cv-link-name").textContent=name.replace(/\.html?$/i,"");
+
+    // Track visit in background
     var visitEntry={time:Date.now(),device:getDevice()};
     var visits=(data.visitLog||[]).concat([visitEntry]).slice(-200);
     dbC.collection("links").doc(id).update({
       visitCount:firebase.firestore.FieldValue.increment(1),
       visitLog:visits
     }).catch(function(){});
-    // Update local data too
     data.visitCount=(data.visitCount||0)+1;
     data.visitLog=visits;
 
-    var name=data.displayName||data.name||"";
-    document.getElementById("cv-link-name").textContent=name.replace(/\.html?$/i,"");
-    document.getElementById("cv-loading").style.display="none";
-    document.getElementById("cv-loginform").style.display="block";
   }catch(e){cvShowState("notfound");}
 }
 
 async function cvLogin(){
+  // If Firebase not loaded yet, show brief message
+  if(!window._cvData){
+    var err=document.getElementById("cv-err");
+    err.textContent="Please wait, loading...";
+    err.classList.add("on");
+    setTimeout(function(){err.classList.remove("on");},2000);
+    return;
+  }
   var userId=document.getElementById("cv-uid").value.trim();
   var pw=document.getElementById("cv-pw").value;
   if(!userId||!pw)return;
