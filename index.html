@@ -525,12 +525,18 @@ button{font-family:'DM Sans',sans-serif;cursor:pointer;}
       </div>
       <div class="settings-section">
         <div class="settings-title">🔑 Admin Master Access</div>
-        <p style="font-size:13px;color:var(--txt-2);margin-bottom:16px;line-height:1.6;">Set a master password. Your admin email + this password will automatically work on every new link you create — no need to add yourself as a client each time.</p>
-        <div class="fg">
-          <label class="fl">Master Password</label>
-          <div class="fi-wrap">
-            <input class="fi" id="ss-masterPw" type="password" placeholder="Set admin master password"/>
-            <button class="eye-btn" onclick="tEye('ss-masterPw',this)">👁</button>
+        <p style="font-size:13px;color:var(--txt-2);margin-bottom:16px;line-height:1.6;">Set a master User ID and Password. These credentials will automatically work on every new link you create.</p>
+        <div class="settings-grid">
+          <div class="fg">
+            <label class="fl">Master User ID</label>
+            <input class="fi" id="ss-masterUid" placeholder="e.g. admin or your name"/>
+          </div>
+          <div class="fg">
+            <label class="fl">Master Password</label>
+            <div class="fi-wrap">
+              <input class="fi" id="ss-masterPw" type="password" placeholder="Min 4 characters"/>
+              <button class="eye-btn" onclick="tEye('ss-masterPw',this)">👁</button>
+            </div>
           </div>
         </div>
         <div id="ss-masterStatus" style="font-size:12px;margin-top:6px;display:none;"></div>
@@ -728,7 +734,13 @@ button{font-family:'DM Sans',sans-serif;cursor:pointer;}
             <button class="eye-btn" onclick="tEye('cedit-pw',this)">👁</button>
           </div>
         </div>
-        <div class="fg"><label class="fl">Expiry Date</label><input class="fi" id="cedit-exp" type="date"/></div>
+        <div class="fg" id="cedit-exp-row">
+          <label class="fl">Expiry Date</label>
+          <input class="fi" id="cedit-exp" type="date"/>
+        </div>
+      </div>
+      <div id="cedit-admin-notice" style="display:none;background:var(--gold-dim);border:1px solid rgba(239,168,0,0.2);border-radius:var(--r-sm);padding:10px 14px;font-size:12px;color:var(--gold);margin-bottom:12px;">
+        🔑 Admin Master Access — No expiry applies
       </div>
       <div class="fg">
         <label class="fl">Note (optional)</label>
@@ -1154,12 +1166,13 @@ async function doCreateLink(){
     // ── Auto-add admin master password client ───────────────
     var adminClients=[];
     var masterPw=window._adminMasterPw;
+    var adminUid=window._adminMasterUid;
     var adminEmail=(auth.currentUser.email||"admin").split("@")[0];
-    if(masterPw&&masterPw.length>=4){
+    if(masterPw&&masterPw.length>=4&&adminUid){
       var aSalt=rSalt();
       var aWrapped=await wrapMK(masterKey,masterPw,aSalt);
       adminClients=[{
-        id:uid4(),userId:adminEmail,fullName:"Admin ("+adminEmail+")",
+        id:uid4(),userId:adminUid,fullName:"Admin ("+adminUid+")",
         salt:aSalt,wrappedMasterKey:aWrapped,
         active:true,expiresAt:null,
         views:0,loginCount:0,lastLogin:null,
@@ -1323,6 +1336,7 @@ function openCEdit(uid2){
   var f=find(activeDocId);if(!f)return;
   var u=find2(f,uid2);if(!u)return;
   _ceditId=uid2;
+  var isAdmin=u.isAdmin||false;
   document.getElementById("cedit-sub").textContent=(u.fullName||u.userId)+" · Client ID: "+u.userId;
   document.getElementById("cedit-fn").value=u.fullName||"";
   document.getElementById("cedit-uid").value=u.userId||"";
@@ -1331,6 +1345,11 @@ function openCEdit(uid2){
   document.getElementById("cedit-note").value=u.note||"";
   document.getElementById("cedit-btn").disabled=false;
   document.getElementById("cedit-btn").innerHTML="💾 Save Changes";
+  // Hide expiry for admin clients, show admin notice
+  var expRow=document.getElementById("cedit-exp-row");
+  var adminNotice=document.getElementById("cedit-admin-notice");
+  if(expRow)expRow.style.display=isAdmin?"none":"block";
+  if(adminNotice)adminNotice.style.display=isAdmin?"block":"none";
   document.getElementById("cedit-ov").classList.add("on");
 }
 function closeCEdit(){document.getElementById("cedit-ov").classList.remove("on");_ceditId=null;}
@@ -1359,7 +1378,8 @@ async function saveCEdit(){
       if(newFn)up.fullName=newFn;
       if(newUid)up.userId=newUid;
       up.note=newNote;
-      up.expiresAt=newExp?new Date(newExp+"T23:59:59").getTime():null;
+      // Admin clients never get expiry
+      if(!up.isAdmin)up.expiresAt=newExp?new Date(newExp+"T23:59:59").getTime():null;
       return up;
     }));
     await db.collection("links").doc(activeDocId).update({passwords:pws});
@@ -1405,7 +1425,7 @@ function _renderActivity(f,u){
   document.getElementById("act-client-name").textContent=(u.fullName||u.userId)+' · ID: '+u.userId;
 
   // ── Check if currently active (lastSeen within 7 mins) ──
-  var isOnline=u.lastSeen&&(Date.now()-u.lastSeen)<7*60*1000;
+  var isOnline=u.lastSeen&&(Date.now()-u.lastSeen)<6*60*1000;
   var onlineBadge=isOnline?
     '<span style="background:var(--ok-dim);color:var(--ok);border:1px solid rgba(31,209,122,0.3);border-radius:20px;font-size:11px;font-weight:700;padding:3px 10px;margin-left:8px;">🟢 Active Now</span>':
     (u.lastSeen?'<span style="font-size:11px;color:var(--txt-3);margin-left:8px;">Last seen: '+fmtTime(u.lastSeen)+'</span>':'');
@@ -1447,15 +1467,17 @@ function _renderActivity(f,u){
     }
   });
 
-  // Open session (logged in, never logged out)
+  // Open session — only mark active if heartbeat is recent (within 6 min)
   if(openLogin){
+    var stillActive=u.lastSeen&&(Date.now()-u.lastSeen)<6*60*1000;
     sessions.push({
       type:'session',
       from:openLogin.loginTime,
-      to:null, // still active
+      to:null,
       dur:Math.round((Date.now()-openLogin.loginTime)/1000),
       device:openLogin.device,
-      active:true
+      active:stillActive,
+      lastSeen:u.lastSeen||null
     });
   }
 
@@ -1480,8 +1502,11 @@ function _renderActivity(f,u){
       var fromStr=fmtTime(s.from);
       var toStr=s.active?
         '<span style="color:var(--ok);font-weight:700;">Active Now</span>':
+        s.lastSeen?'<span style="color:var(--txt-3);">Last seen '+fmtTime(s.lastSeen)+'</span>':
         fmtTime(s.to);
-      var durBadge='<span style="font-size:10px;padding:2px 8px;border-radius:10px;margin-left:6px;'+(s.active?'background:var(--ok-dim);color:var(--ok);':'background:var(--info-dim);color:var(--info);')+'">⏱ '+fmtDur(s.dur)+'</span>';
+      var durBadge=s.active?
+        '<span style="font-size:10px;padding:2px 8px;border-radius:10px;margin-left:6px;background:var(--ok-dim);color:var(--ok);">⏱ '+fmtDur(s.dur)+'</span>':
+        s.to?'<span style="font-size:10px;padding:2px 8px;border-radius:10px;margin-left:6px;background:var(--info-dim);color:var(--info);">⏱ '+fmtDur(s.dur)+'</span>':'';
       return '<div class="act-row" style="'+(s.active?'border-color:rgba(31,209,122,0.25);background:rgba(31,209,122,0.04);':'')+'">'+
         '<div class="act-row-ico">'+(s.active?'🟢':'🕐')+'</div>'+
         '<div class="act-row-info" style="flex:1;min-width:0;">'+
@@ -1509,6 +1534,7 @@ async function loadSettingsFromDB(){
       var d=doc.data();
       if(d.appUrl)CFG.appUrl=d.appUrl;
       if(d.masterPw)window._adminMasterPw=d.masterPw;
+      if(d.masterUid)window._adminMasterUid=d.masterUid;
     }
   }catch(e){}
   loadSettingsUI();
@@ -1518,30 +1544,36 @@ function loadSettingsUI(){
   document.getElementById("ss-ad").value=CFG.firebase.authDomain||"";
   document.getElementById("ss-url").value=CFG.appUrl||"";
   var st=document.getElementById("ss-masterStatus");
-  if(window._adminMasterPw){
+  if(window._adminMasterPw&&window._adminMasterUid){
     st.style.display="block";
-    st.innerHTML='<span style="color:var(--ok);">✓ Master password is set. Enter new value to change.</span>';
+    st.innerHTML='<span style="color:var(--ok);">✓ Master access set — User ID: <strong>'+esc(window._adminMasterUid)+'</strong>. Enter new values to change.</span>';
   }
 }
 async function saveSettings(){
   var url=g("ss-url");
   var mp=document.getElementById("ss-masterPw").value;
+  var mu=g("ss-masterUid");
   var st=document.getElementById("ss-masterStatus");
-  if(mp&&mp.length<4){toast("Master password must be at least 4 characters","err");return;}
+  if((mp&&mp.length<4)){toast("Master password must be at least 4 characters","err");return;}
+  if(mp&&!mu){toast("Please set a Master User ID too","err");return;}
+  if(mu&&!mp&&!window._adminMasterPw){toast("Please set a Master Password too","err");return;}
   var uid=auth.currentUser.uid;
   var toSave={appUrl:url};
-  if(mp&&mp.length>=4){
+  if(mp&&mu){
     toSave.masterPw=mp;
+    toSave.masterUid=mu;
     window._adminMasterPw=mp;
+    window._adminMasterUid=mu;
   }
   try{
     await db.collection("settings").doc(uid).set(toSave,{merge:true});
     CFG.appUrl=url;
-    if(mp&&mp.length>=4){
+    if(mp&&mu){
       st.style.display="block";
-      st.innerHTML='<span style="color:var(--ok);">✓ Master password saved.</span>';
+      st.innerHTML='<span style="color:var(--ok);">✓ Master access saved — User ID: <strong>'+esc(mu)+'</strong></span>';
       document.getElementById("ss-masterPw").value="";
-      toast("Settings saved. Master password updated.","ok");
+      document.getElementById("ss-masterUid").value="";
+      toast("Settings saved. Master access updated.","ok");
     }else{
       toast("Settings saved","ok");
     }
