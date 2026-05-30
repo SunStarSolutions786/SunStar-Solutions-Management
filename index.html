@@ -765,7 +765,7 @@ button{font-family:'DM Sans',sans-serif;cursor:pointer;}
 <div id="toast-wrap"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.4.4/lz-string.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
@@ -1792,114 +1792,137 @@ function cvToggleEye(){
 }
 
 /* ═══════════════════════ EXCEL EXPORT ═══════════════════════ */
-function xlCell(v,s){return{v:v,s:s};}
-
-var XS={
-  title:{font:{bold:true,sz:16,color:{rgb:"EFA800"}},fill:{fgColor:{rgb:"06091A"}},alignment:{horizontal:"left"}},
-  subInfo:{font:{sz:11,color:{rgb:"7A8DB8"}},fill:{fgColor:{rgb:"06091A"}}},
-  blank:{fill:{fgColor:{rgb:"06091A"}}},
-  hdr:{font:{bold:true,sz:11,color:{rgb:"000000"}},fill:{fgColor:{rgb:"EFA800"}},alignment:{horizontal:"center",wrapText:true},border:{bottom:{style:"medium",color:{rgb:"C88A00"}}}},
-  rowA:{font:{sz:10,color:{rgb:"E0E8FF"}},fill:{fgColor:{rgb:"0C1229"}},alignment:{wrapText:true}},
-  rowB:{font:{sz:10,color:{rgb:"E0E8FF"}},fill:{fgColor:{rgb:"111A38"}},alignment:{wrapText:true}},
-  active:{font:{bold:true,sz:10,color:{rgb:"1FD17A"}},fill:{fgColor:{rgb:"0C1229"}},alignment:{horizontal:"center"}},
-  activeB:{font:{bold:true,sz:10,color:{rgb:"1FD17A"}},fill:{fgColor:{rgb:"111A38"}},alignment:{horizontal:"center"}},
-  inactive:{font:{bold:true,sz:10,color:{rgb:"FF4466"}},fill:{fgColor:{rgb:"0C1229"}},alignment:{horizontal:"center"}},
-  inactiveB:{font:{bold:true,sz:10,color:{rgb:"FF4466"}},fill:{fgColor:{rgb:"111A38"}},alignment:{horizontal:"center"}},
-  expired:{font:{bold:true,sz:10,color:{rgb:"FF4466"}},fill:{fgColor:{rgb:"0C1229"}},alignment:{horizontal:"center"}},
-  expiredB:{font:{bold:true,sz:10,color:{rgb:"FF4466"}},fill:{fgColor:{rgb:"111A38"}},alignment:{horizontal:"center"}},
-  warn:{font:{bold:true,sz:10,color:{rgb:"F59E0B"}},fill:{fgColor:{rgb:"0C1229"}},alignment:{horizontal:"center"}},
-  warnB:{font:{bold:true,sz:10,color:{rgb:"F59E0B"}},fill:{fgColor:{rgb:"111A38"}},alignment:{horizontal:"center"}},
-  gold:{font:{bold:true,sz:10,color:{rgb:"EFA800"}},fill:{fgColor:{rgb:"0C1229"}},alignment:{horizontal:"center"}},
-  goldB:{font:{bold:true,sz:10,color:{rgb:"EFA800"}},fill:{fgColor:{rgb:"111A38"}},alignment:{horizontal:"center"}},
-  num:{font:{sz:10,color:{rgb:"4B9FFF"}},fill:{fgColor:{rgb:"0C1229"}},alignment:{horizontal:"center"}},
-  numB:{font:{sz:10,color:{rgb:"4B9FFF"}},fill:{fgColor:{rgb:"111A38"}},alignment:{horizontal:"center"}},
-  fail:{font:{bold:true,sz:10,color:{rgb:"FF4466"}},fill:{fgColor:{rgb:"0C1229"}},alignment:{horizontal:"center"}},
-  failB:{font:{bold:true,sz:10,color:{rgb:"FF4466"}},fill:{fgColor:{rgb:"111A38"}},alignment:{horizontal:"center"}},
-  session:{font:{sz:10,color:{rgb:"4B9FFF"}},fill:{fgColor:{rgb:"0C1229"}},alignment:{horizontal:"center"}},
-  sessionB:{font:{sz:10,color:{rgb:"4B9FFF"}},fill:{fgColor:{rgb:"111A38"}},alignment:{horizontal:"center"}},
-  link:{font:{sz:10,color:{rgb:"7A8DB8"},underline:true},fill:{fgColor:{rgb:"0C1229"}}},
-  linkB:{font:{sz:10,color:{rgb:"7A8DB8"},underline:true},fill:{fgColor:{rgb:"111A38"}}},
-};
-
-function mkSheet(rows,cols){
-  var ws={};
-  var maxC=0;
-  rows.forEach(function(row,r){
-    if(row.length>maxC)maxC=row.length;
-    row.forEach(function(cell,c){
-      var addr=XLSX.utils.encode_cell({r:r,c:c});
-      if(cell&&typeof cell==='object'&&'v' in cell){ws[addr]=cell;}
-      else{ws[addr]={v:cell===null||cell===undefined?'':cell};}
-    });
-  });
-  ws['!ref']=XLSX.utils.encode_range({s:{r:0,c:0},e:{r:rows.length-1,c:maxC-1}});
-  ws['!cols']=cols;
-  return ws;
-}
-
-function exportExcel(){
+async function exportExcel(){
   if(!allLinks.length){toast("No links to export","info");return;}
-  if(typeof XLSX==="undefined"){toast("Excel library not loaded, try again","err");return;}
+  if(typeof ExcelJS==="undefined"){toast("Excel library not loaded, try again","err");return;}
 
-  var wb=XLSX.utils.book_new();
+  var wb=new ExcelJS.Workbook();
+  wb.creator="SunStar Solutions Management";
+  wb.created=new Date();
+
   var now=new Date().toLocaleString('en-US',{dateStyle:'full',timeStyle:'short'});
-  var even=true; // alternating row color
+
+  // ── Color palette ──
+  var C={
+    bg1:"06091A",bg2:"0C1229",bg3:"111A38",
+    gold:"EFA800",goldDark:"C88A00",goldLight:"FFF3CC",
+    txt:"E0E8FF",txt2:"7A8DB8",
+    green:"1FD17A",greenBg:"0A2E1C",
+    red:"FF4466",redBg:"2E0A14",
+    blue:"4B9FFF",blueBg:"0A1A2E",
+    amber:"F59E0B",amberBg:"2E1E0A",
+    white:"FFFFFF",black:"000000"
+  };
+
+  function hdr(ws,row,cols){
+    var r=ws.addRow(cols);
+    r.eachCell(function(cell){
+      cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF'+C.gold}};
+      cell.font={bold:true,size:11,color:{argb:'FF'+C.black}};
+      cell.alignment={horizontal:'center',vertical:'middle',wrapText:true};
+      cell.border={
+        top:{style:'thin',color:{argb:'FF'+C.goldDark}},
+        bottom:{style:'medium',color:{argb:'FF'+C.goldDark}},
+        left:{style:'thin',color:{argb:'FF'+C.goldDark}},
+        right:{style:'thin',color:{argb:'FF'+C.goldDark}}
+      };
+    });
+    r.height=28;
+    return r;
+  }
+
+  function titleRow(ws,txt,cols){
+    var r=ws.addRow([txt]);
+    ws.mergeCells(r.number,1,r.number,cols);
+    r.getCell(1).font={bold:true,size:15,color:{argb:'FF'+C.gold}};
+    r.getCell(1).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF'+C.bg1}};
+    r.getCell(1).alignment={horizontal:'left',vertical:'middle'};
+    r.height=32;
+  }
+
+  function subRow(ws,txt,cols){
+    var r=ws.addRow([txt]);
+    ws.mergeCells(r.number,1,r.number,cols);
+    r.getCell(1).font={size:10,color:{argb:'FF'+C.txt2}};
+    r.getCell(1).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF'+C.bg1}};
+    r.height=18;
+  }
+
+  function dataCell(cell,val,opts){
+    opts=opts||{};
+    cell.value=val;
+    var bg=opts.bg||C.bg2;
+    cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF'+bg}};
+    cell.font={size:10,color:{argb:'FF'+(opts.color||C.txt)},bold:opts.bold||false};
+    cell.alignment={horizontal:opts.align||'left',vertical:'middle',wrapText:true};
+    cell.border={
+      bottom:{style:'hair',color:{argb:'FF'+C.bg3}},
+      right:{style:'hair',color:{argb:'FF'+C.bg3}}
+    };
+  }
+
+  function altBg(i){return i%2===0?C.bg2:C.bg3;}
 
   /* ══════════════════════════════════════════
      SHEET 1: SUMMARY
   ══════════════════════════════════════════ */
-  var S1=[];
-  S1.push([xlCell("SunStar Solutions Management — Activity Report",XS.title),"","","","","","","",""]);
-  S1.push([xlCell("Exported: "+now,XS.subInfo),"","","","","","","",""]);
-  S1.push(["","","","","","","","",""]);
-  S1.push([
-    xlCell("Link Name",XS.hdr),xlCell("Share URL",XS.hdr),xlCell("Created",XS.hdr),
-    xlCell("File Size",XS.hdr),xlCell("Link Opens",XS.hdr),xlCell("Total Logins",XS.hdr),
-    xlCell("Active Clients",XS.hdr),xlCell("Total Clients",XS.hdr),xlCell("Status",XS.hdr)
-  ]);
+  var ws1=wb.addWorksheet('Summary',{
+    properties:{tabColor:{argb:'FF'+C.gold}},
+    views:[{state:'frozen',ySplit:4}]
+  });
+  ws1.columns=[
+    {width:30},{width:52},{width:14},{width:12},
+    {width:12},{width:13},{width:14},{width:14},{width:12}
+  ];
+  titleRow(ws1,"SunStar Solutions Management — Activity Report",9);
+  subRow(ws1,"Exported: "+now,9);
+  ws1.addRow([]);
+  hdr(ws1,4,["Link Name","Share URL","Created","File Size","Link Opens","Total Logins","Active Clients","Total Clients","Status"]);
+
   allLinks.forEach(function(f,i){
-    var bg=i%2===0?'rowA':'rowB';
+    var bg=altBg(i);
     var clients=f.passwords||[];
     var activeC=clients.filter(function(u){
       return u.active&&(!u.expiresAt||new Date(u.expiresAt)>new Date());
     }).length;
     var totalLogins=clients.reduce(function(s,u){return s+(u.loginCount||0);},0);
-    var statusStyle=f.active?(i%2===0?XS.active:XS.activeB):(i%2===0?XS.inactive:XS.inactiveB);
-    S1.push([
-      xlCell(f.displayName||f.name||"",XS[bg]),
-      xlCell(getShareUrl(f.id),i%2===0?XS.link:XS.linkB),
-      xlCell(f.createdAt?formatDate(f.createdAt):"",XS[bg]),
-      xlCell(formatSize(f.size||0),XS[bg]),
-      xlCell(f.visitCount||0,i%2===0?XS.num:XS.numB),
-      xlCell(totalLogins,i%2===0?XS.num:XS.numB),
-      xlCell(activeC,i%2===0?XS.num:XS.numB),
-      xlCell(clients.length,i%2===0?XS.num:XS.numB),
-      xlCell(f.active?"● Active":"○ Inactive",statusStyle)
-    ]);
+    var r=ws1.addRow([]);
+    r.height=20;
+    dataCell(r.getCell(1),f.displayName||f.name||"",{bg:bg});
+    dataCell(r.getCell(2),getShareUrl(f.id),{bg:bg,color:C.blue});
+    dataCell(r.getCell(3),f.createdAt?formatDate(f.createdAt):"",{bg:bg,align:'center'});
+    dataCell(r.getCell(4),formatSize(f.size||0),{bg:bg,align:'center'});
+    dataCell(r.getCell(5),f.visitCount||0,{bg:bg,color:C.blue,align:'center'});
+    dataCell(r.getCell(6),totalLogins,{bg:bg,color:C.blue,align:'center'});
+    dataCell(r.getCell(7),activeC,{bg:bg,color:C.green,align:'center',bold:true});
+    dataCell(r.getCell(8),clients.length,{bg:bg,color:C.blue,align:'center'});
+    var stColor=f.active?C.green:C.red;
+    var stText=f.active?"● Active":"○ Inactive";
+    dataCell(r.getCell(9),stText,{bg:f.active?C.greenBg:C.redBg,color:stColor,bold:true,align:'center'});
   });
-  var ws1=mkSheet(S1,[{wch:30},{wch:55},{wch:14},{wch:12},{wch:12},{wch:13},{wch:14},{wch:14},{wch:12}]);
-  ws1['!merges']=[{s:{r:0,c:0},e:{r:0,c:8}},{s:{r:1,c:0},e:{r:1,c:8}}];
-  XLSX.utils.book_append_sheet(wb,ws1,"📋 Summary");
 
   /* ══════════════════════════════════════════
      SHEET 2: ALL CLIENTS
   ══════════════════════════════════════════ */
-  var S2=[];
-  S2.push([xlCell("SunStar Solutions — Client Directory",XS.title),"","","","","","","","","","",""]);
-  S2.push([xlCell("Exported: "+now,XS.subInfo),"","","","","","","","","","",""]);
-  S2.push(["","","","","","","","","","","",""]);
-  S2.push([
-    xlCell("Link Name",XS.hdr),xlCell("Full Name",XS.hdr),xlCell("Client ID",XS.hdr),
-    xlCell("Status",XS.hdr),xlCell("Expiry Date",XS.hdr),xlCell("Days Left",XS.hdr),
-    xlCell("Total Logins",XS.hdr),xlCell("Failed Attempts",XS.hdr),
-    xlCell("Last Login",XS.hdr),xlCell("Last Seen",XS.hdr),
-    xlCell("Note",XS.hdr),xlCell("Type",XS.hdr)
-  ]);
+  var ws2=wb.addWorksheet('All Clients',{
+    properties:{tabColor:{argb:'FF'+C.blue}},
+    views:[{state:'frozen',ySplit:4}]
+  });
+  ws2.columns=[
+    {width:28},{width:22},{width:20},{width:11},
+    {width:16},{width:10},{width:13},{width:16},
+    {width:20},{width:20},{width:22},{width:10}
+  ];
+  titleRow(ws2,"SunStar Solutions — Client Directory",12);
+  subRow(ws2,"Exported: "+now,12);
+  ws2.addRow([]);
+  hdr(ws2,4,["Link Name","Full Name","Client ID","Status","Expiry Date","Days Left","Total Logins","Failed Attempts","Last Login","Last Seen","Note","Type"]);
+
   var ci=0;
   allLinks.forEach(function(f){
     var linkName=f.displayName||f.name||"";
     (f.passwords||[]).forEach(function(u){
-      var bg=ci%2===0?'rowA':'rowB';
+      var bg=altBg(ci);
       var exp=u.expiresAt?new Date(u.expiresAt):null;
       var now2=new Date();
       var daysLeft=exp?Math.max(0,Math.ceil((exp-now2)/86400000)):"∞";
@@ -1909,49 +1932,48 @@ function exportExcel(){
       var failed=(u.activityLog||[]).filter(function(e){return e.type==='fail';}).length||u.failedAttempts||0;
       var isExpired=exp&&exp<now2;
       var status=!u.active?"Disabled":isExpired?"Expired":"Active";
-      var statusSt=!u.active?(ci%2===0?XS.inactive:XS.inactiveB):isExpired?(ci%2===0?XS.expired:XS.expiredB):(ci%2===0?XS.active:XS.activeB);
-      var daysSt=exp&&daysLeft<=7?(ci%2===0?XS.warn:XS.warnB):(ci%2===0?XS.num:XS.numB);
-      var failSt=failed>0?(ci%2===0?XS.fail:XS.failB):(ci%2===0?XS.num:XS.numB);
-      S2.push([
-        xlCell(linkName,XS[bg]),
-        xlCell(u.fullName||u.userId||"",XS[bg]),
-        xlCell(u.userId||"",u.isAdmin?(ci%2===0?XS.gold:XS.goldB):XS[bg]),
-        xlCell(status,statusSt),
-        xlCell(expStr,XS[bg]),
-        xlCell(daysLeft,daysSt),
-        xlCell(u.loginCount||0,ci%2===0?XS.num:XS.numB),
-        xlCell(failed,failSt),
-        xlCell(lastLogin,XS[bg]),
-        xlCell(lastSeen,XS[bg]),
-        xlCell(u.note||"",XS[bg]),
-        xlCell(u.isAdmin?"★ Admin":"Client",u.isAdmin?(ci%2===0?XS.gold:XS.goldB):XS[bg])
-      ]);
+      var statusColor=!u.active?C.red:isExpired?C.red:C.green;
+      var statusBg=!u.active?C.redBg:isExpired?C.redBg:C.greenBg;
+      var daysBg=exp&&daysLeft<=7?C.amberBg:bg;
+      var daysColor=exp&&daysLeft<=7?C.amber:C.blue;
+
+      var r=ws2.addRow([]);r.height=20;
+      dataCell(r.getCell(1),linkName,{bg:bg});
+      dataCell(r.getCell(2),u.fullName||u.userId||"",{bg:bg,bold:true});
+      dataCell(r.getCell(3),u.userId||"",{bg:bg,color:u.isAdmin?C.gold:C.txt});
+      dataCell(r.getCell(4),status,{bg:statusBg,color:statusColor,bold:true,align:'center'});
+      dataCell(r.getCell(5),expStr,{bg:bg,align:'center'});
+      dataCell(r.getCell(6),daysLeft==="∞"?"∞":daysLeft,{bg:daysBg,color:daysColor,bold:true,align:'center'});
+      dataCell(r.getCell(7),u.loginCount||0,{bg:bg,color:C.blue,align:'center'});
+      dataCell(r.getCell(8),failed,{bg:failed>0?C.redBg:bg,color:failed>0?C.red:C.txt,bold:failed>0,align:'center'});
+      dataCell(r.getCell(9),lastLogin,{bg:bg,align:'center'});
+      dataCell(r.getCell(10),lastSeen,{bg:bg,align:'center'});
+      dataCell(r.getCell(11),u.note||"",{bg:bg});
+      dataCell(r.getCell(12),u.isAdmin?"★ Admin":"Client",{bg:u.isAdmin?C.amberBg:bg,color:u.isAdmin?C.gold:C.txt2,bold:u.isAdmin,align:'center'});
       ci++;
     });
   });
-  var ws2=mkSheet(S2,[{wch:28},{wch:22},{wch:20},{wch:10},{wch:16},{wch:10},{wch:13},{wch:16},{wch:20},{wch:20},{wch:22},{wch:10}]);
-  ws2['!merges']=[{s:{r:0,c:0},e:{r:0,c:11}},{s:{r:1,c:0},e:{r:1,c:11}}];
-  XLSX.utils.book_append_sheet(wb,ws2,"👥 All Clients");
 
   /* ══════════════════════════════════════════
      SHEET 3: SESSION LOG
   ══════════════════════════════════════════ */
-  var S3=[];
-  S3.push([xlCell("SunStar Solutions — Session Activity Log",XS.title),"","","","","","","",""]);
-  S3.push([xlCell("Exported: "+now,XS.subInfo),"","","","","","","",""]);
-  S3.push(["","","","","","","","",""]);
-  S3.push([
-    xlCell("Link Name",XS.hdr),xlCell("Client Name",XS.hdr),xlCell("Client ID",XS.hdr),
-    xlCell("Event",XS.hdr),xlCell("Date",XS.hdr),xlCell("Login Time",XS.hdr),
-    xlCell("Logout / End",XS.hdr),xlCell("Duration",XS.hdr),xlCell("Device",XS.hdr)
-  ]);
+  var ws3=wb.addWorksheet('Session Log',{
+    properties:{tabColor:{argb:'FF'+C.green}},
+    views:[{state:'frozen',ySplit:4}]
+  });
+  ws3.columns=[
+    {width:28},{width:22},{width:20},{width:16},
+    {width:16},{width:12},{width:14},{width:12},{width:32}
+  ];
+  titleRow(ws3,"SunStar Solutions — Session Activity Log",9);
+  subRow(ws3,"Exported: "+now,9);
+  ws3.addRow([]);
+  hdr(ws3,4,["Link Name","Client Name","Client ID","Event","Date","Login Time","Logout / End","Duration","Device"]);
 
   var allSessions=[];
   allLinks.forEach(function(f){
     var linkName=f.displayName||f.name||"";
     (f.passwords||[]).forEach(function(u){
-      var clientName=u.fullName||u.userId||"";
-      var clientId=u.userId||"";
       var sortedLog=[].concat(u.activityLog||[]).sort(function(a,b){return a.time-b.time;});
       var openLogin=null;
       sortedLog.forEach(function(e){
@@ -1959,67 +1981,63 @@ function exportExcel(){
           openLogin={time:e.time,device:e.device||"Unknown"};
         }else if(e.type==='logout'&&openLogin){
           var dur=e.sessionSec||Math.round((e.time-openLogin.time)/1000);
-          allSessions.push({
-            linkName:linkName,clientName:clientName,clientId:clientId,
-            event:"Session",sortTime:openLogin.time,
-            loginTime:openLogin.time,logoutTime:e.time,
-            dur:fmtDur(dur),device:openLogin.device,status:"Completed"
-          });
+          allSessions.push({linkName:linkName,clientName:u.fullName||u.userId||"",clientId:u.userId||"",
+            event:"Session",time:openLogin.time,loginTime:openLogin.time,logoutTime:e.time,
+            dur:fmtDur(dur),device:openLogin.device,status:"Completed"});
           openLogin=null;
         }else if(e.type==='fail'){
-          allSessions.push({
-            linkName:linkName,clientName:clientName,clientId:clientId,
-            event:"Failed Attempt",sortTime:e.time,
-            loginTime:e.time,logoutTime:null,
-            dur:"—",device:e.device||"Unknown",status:"Failed"
-          });
+          allSessions.push({linkName:linkName,clientName:u.fullName||u.userId||"",clientId:u.userId||"",
+            event:"Failed",time:e.time,loginTime:e.time,logoutTime:null,
+            dur:"—",device:e.device||"Unknown",status:"Failed"});
         }
       });
       if(openLogin){
         var isAct=u.lastSeen&&(Date.now()-u.lastSeen)<6*60*1000;
-        allSessions.push({
-          linkName:linkName,clientName:clientName,clientId:clientId,
-          event:"Session",sortTime:openLogin.time,
-          loginTime:openLogin.time,logoutTime:null,
+        allSessions.push({linkName:linkName,clientName:u.fullName||u.userId||"",clientId:u.userId||"",
+          event:"Session",time:openLogin.time,loginTime:openLogin.time,logoutTime:null,
           dur:fmtDur(Math.round((Date.now()-openLogin.time)/1000)),
-          device:openLogin.device,status:isAct?"Active Now":"Open"
-        });
+          device:openLogin.device,status:isAct?"Active Now":"Open"});
       }
     });
   });
+  allSessions.sort(function(a,b){return b.time-a.time;});
 
-  allSessions.sort(function(a,b){return b.sortTime-a.sortTime;});
-  allSessions.forEach(function(s,i){
-    var bg=i%2===0?'rowA':'rowB';
-    var isFail=s.status==="Failed";
-    var isActive=s.status==="Active Now";
-    var eventSt=isFail?(i%2===0?XS.fail:XS.failB):isActive?(i%2===0?XS.active:XS.activeB):(i%2===0?XS.session:XS.sessionB);
-    var statusSt=isFail?(i%2===0?XS.fail:XS.failB):isActive?(i%2===0?XS.active:XS.activeB):(i%2===0?XS.num:XS.numB);
-    var fmtT=function(ts){return ts?new Date(ts).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:true}):"—";};
-    var fmtD=function(ts){return ts?new Date(ts).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):"—";};
-    S3.push([
-      xlCell(s.linkName,XS[bg]),
-      xlCell(s.clientName,XS[bg]),
-      xlCell(s.clientId,XS[bg]),
-      xlCell(isFail?"⛔ "+s.event:isActive?"🟢 "+s.event:"🕐 "+s.event,eventSt),
-      xlCell(fmtD(s.loginTime),XS[bg]),
-      xlCell(fmtT(s.loginTime),XS[bg]),
-      xlCell(s.logoutTime?fmtT(s.logoutTime):isActive?"Active Now":"—",i%2===0?XS.num:XS.numB),
-      xlCell(s.dur,statusSt),
-      xlCell(s.device,XS[bg])
-    ]);
-  });
-
-  if(allSessions.length===0){
-    S3.push([xlCell("No session data recorded yet.",XS.subInfo),"","","","","","","",""]);
+  if(!allSessions.length){
+    var er=ws3.addRow(["No session data recorded yet."]);
+    er.getCell(1).font={color:{argb:'FF'+C.txt2},size:10};
+    er.getCell(1).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF'+C.bg2}};
   }
 
-  var ws3=mkSheet(S3,[{wch:28},{wch:22},{wch:20},{wch:18},{wch:16},{wch:12},{wch:14},{wch:12},{wch:32}]);
-  ws3['!merges']=[{s:{r:0,c:0},e:{r:0,c:8}},{s:{r:1,c:0},e:{r:1,c:8}}];
-  XLSX.utils.book_append_sheet(wb,ws3,"📊 Session Log");
+  allSessions.forEach(function(s,i){
+    var bg=altBg(i);
+    var isFail=s.status==="Failed";
+    var isActive=s.status==="Active Now";
+    var evColor=isFail?C.red:isActive?C.green:C.blue;
+    var evBg=isFail?C.redBg:isActive?C.greenBg:C.blueBg;
+    var fmtT=function(ts){return ts?new Date(ts).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:true}):"—";};
+    var fmtD=function(ts){return ts?new Date(ts).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):"—";};
+    var evLabel=isFail?"⛔ Failed Attempt":isActive?"🟢 Active Session":"🕐 Completed";
+    var r=ws3.addRow([]);r.height=20;
+    dataCell(r.getCell(1),s.linkName,{bg:bg});
+    dataCell(r.getCell(2),s.clientName,{bg:bg,bold:true});
+    dataCell(r.getCell(3),s.clientId,{bg:bg});
+    dataCell(r.getCell(4),evLabel,{bg:evBg,color:evColor,bold:true,align:'center'});
+    dataCell(r.getCell(5),fmtD(s.loginTime),{bg:bg,align:'center'});
+    dataCell(r.getCell(6),fmtT(s.loginTime),{bg:bg,align:'center'});
+    dataCell(r.getCell(7),s.logoutTime?fmtT(s.logoutTime):isActive?"Active Now":"—",{bg:bg,color:isActive?C.green:C.txt,align:'center'});
+    dataCell(r.getCell(8),s.dur,{bg:evBg,color:evColor,bold:true,align:'center'});
+    dataCell(r.getCell(9),s.device,{bg:bg,color:C.txt2});
+  });
 
-  var date=new Date().toISOString().split('T')[0];
-  XLSX.writeFile(wb,"SunStar_Report_"+date+".xlsx");
+  // ── Download ──
+  var buf=await wb.xlsx.writeBuffer();
+  var blob=new Blob([buf],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement("a");
+  a.href=url;
+  a.download="SunStar_Report_"+new Date().toISOString().split('T')[0]+".xlsx";
+  document.body.appendChild(a);a.click();
+  document.body.removeChild(a);URL.revokeObjectURL(url);
   toast("Excel report downloaded! 📊","ok");
 }
 
