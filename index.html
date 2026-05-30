@@ -497,6 +497,7 @@ button{font-family:'DM Sans',sans-serif;cursor:pointer;}
           <span class="search-ico">🔍</span>
           <input class="search-inp" id="srch" placeholder="Search links..." oninput="filterLinks()"/>
         </div>
+        <button class="act-btn" style="color:var(--ok);border-color:rgba(31,209,122,0.25);background:var(--ok-dim);white-space:nowrap;padding:10px 16px;" onclick="exportExcel()">📊 Export Excel</button>
       </div>
 
       <div class="link-list" id="link-list">
@@ -528,9 +529,15 @@ button{font-family:'DM Sans',sans-serif;cursor:pointer;}
         <p style="font-size:13px;color:var(--txt-2);margin-bottom:16px;line-height:1.6;">Set a master User ID and Password. These credentials will automatically work on every new link you create.</p>
         <div class="settings-grid">
           <div class="fg">
+            <label class="fl">Full Name</label>
+            <input class="fi" id="ss-masterName" placeholder="e.g. Aminur Rahaman"/>
+          </div>
+          <div class="fg">
             <label class="fl">Master User ID</label>
             <input class="fi" id="ss-masterUid" placeholder="e.g. admin or your name"/>
           </div>
+        </div>
+        <div class="settings-grid">
           <div class="fg">
             <label class="fl">Master Password</label>
             <div class="fi-wrap">
@@ -758,6 +765,7 @@ button{font-family:'DM Sans',sans-serif;cursor:pointer;}
 <div id="toast-wrap"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.4.4/lz-string.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
@@ -1171,8 +1179,9 @@ async function doCreateLink(){
     if(masterPw&&masterPw.length>=4&&adminUid){
       var aSalt=rSalt();
       var aWrapped=await wrapMK(masterKey,masterPw,aSalt);
+      var adminName=window._adminMasterName||adminUid;
       adminClients=[{
-        id:uid4(),userId:adminUid,fullName:"Admin ("+adminUid+")",
+        id:uid4(),userId:adminUid,fullName:adminName,
         salt:aSalt,wrappedMasterKey:aWrapped,
         active:true,expiresAt:null,
         views:0,loginCount:0,lastLogin:null,
@@ -1535,6 +1544,7 @@ async function loadSettingsFromDB(){
       if(d.appUrl)CFG.appUrl=d.appUrl;
       if(d.masterPw)window._adminMasterPw=d.masterPw;
       if(d.masterUid)window._adminMasterUid=d.masterUid;
+      if(d.masterName)window._adminMasterName=d.masterName;
     }
   }catch(e){}
   loadSettingsUI();
@@ -1544,15 +1554,24 @@ function loadSettingsUI(){
   document.getElementById("ss-ad").value=CFG.firebase.authDomain||"";
   document.getElementById("ss-url").value=CFG.appUrl||"";
   var st=document.getElementById("ss-masterStatus");
-  if(window._adminMasterPw&&window._adminMasterUid){
+  var uid=window._adminMasterUid||"";
+  var pw=window._adminMasterPw||"";
+  if(uid&&pw){
     st.style.display="block";
-    st.innerHTML='<span style="color:var(--ok);">✓ Master access set — User ID: <strong>'+esc(window._adminMasterUid)+'</strong>. Enter new values to change.</span>';
+    st.innerHTML='<span style="color:var(--ok);">✓ Master access set — '+(window._adminMasterName?'<strong>'+esc(window._adminMasterName)+'</strong> · ':'')+' User ID: <strong>'+esc(uid)+'</strong>. Enter new values to change.</span>';
+  }else if(pw&&!uid){
+    // Legacy: only password was set before
+    st.style.display="block";
+    st.innerHTML='<span style="color:var(--warn);">⚠ Please set a Master User ID to complete setup.</span>';
+  }else{
+    st.style.display="none";
   }
 }
 async function saveSettings(){
   var url=g("ss-url");
   var mp=document.getElementById("ss-masterPw").value;
   var mu=g("ss-masterUid");
+  var mn=g("ss-masterName");
   var st=document.getElementById("ss-masterStatus");
   if((mp&&mp.length<4)){toast("Master password must be at least 4 characters","err");return;}
   if(mp&&!mu){toast("Please set a Master User ID too","err");return;}
@@ -1562,17 +1581,20 @@ async function saveSettings(){
   if(mp&&mu){
     toSave.masterPw=mp;
     toSave.masterUid=mu;
+    toSave.masterName=mn||mu;
     window._adminMasterPw=mp;
     window._adminMasterUid=mu;
+    window._adminMasterName=mn||mu;
   }
   try{
     await db.collection("settings").doc(uid).set(toSave,{merge:true});
     CFG.appUrl=url;
     if(mp&&mu){
       st.style.display="block";
-      st.innerHTML='<span style="color:var(--ok);">✓ Master access saved — User ID: <strong>'+esc(mu)+'</strong></span>';
+      st.innerHTML='<span style="color:var(--ok);">✓ Master access saved — '+(mn?'<strong>'+esc(mn)+'</strong> · ':'')+'User ID: <strong>'+esc(mu)+'</strong></span>';
       document.getElementById("ss-masterPw").value="";
       document.getElementById("ss-masterUid").value="";
+      document.getElementById("ss-masterName").value="";
       toast("Settings saved. Master access updated.","ok");
     }else{
       toast("Settings saved","ok");
@@ -1767,6 +1789,131 @@ function cvToggleEye(){
   var i=document.getElementById("cv-pw"),p=i.type==="password";
   i.type=p?"text":"password";
   document.querySelector(".cv-eye").innerHTML=p?"🙈":"👁";
+}
+
+/* ═══════════════════════ EXCEL EXPORT ═══════════════════════ */
+function exportExcel(){
+  if(!allLinks.length){toast("No links to export","info");return;}
+  if(typeof XLSX==="undefined"){toast("Excel library not loaded yet, please try again","err");return;}
+
+  var wb=XLSX.utils.book_new();
+
+  // ── Sheet 1: Summary ──────────────────────────────────────
+  var summaryRows=[
+    ["SunStar Solutions Management — Activity Report"],
+    ["Exported:",new Date().toLocaleString('en-US',{dateStyle:'full',timeStyle:'short'})],
+    [""],
+    ["Link Name","Share URL","Created","File Size","Link Opens","Total Logins","Active Clients","Total Clients","Status"]
+  ];
+  allLinks.forEach(function(f){
+    var clients=f.passwords||[];
+    var activeClients=clients.filter(function(u){
+      if(!u.active)return false;
+      if(u.expiresAt&&new Date(u.expiresAt)<new Date())return false;
+      return true;
+    });
+    var totalLogins=clients.reduce(function(s,u){return s+(u.loginCount||0);},0);
+    summaryRows.push([
+      f.displayName||f.name||"",
+      getShareUrl(f.id),
+      f.createdAt?formatDate(f.createdAt):"",
+      formatSize(f.size||0),
+      f.visitCount||0,
+      totalLogins,
+      activeClients.length,
+      clients.length,
+      f.active?"Active":"Inactive"
+    ]);
+  });
+  var wsSummary=XLSX.utils.aoa_to_sheet(summaryRows);
+  wsSummary['!cols']=[{wch:28},{wch:55},{wch:14},{wch:12},{wch:12},{wch:14},{wch:14},{wch:14},{wch:10}];
+  XLSX.utils.book_append_sheet(wb,wsSummary,"Summary");
+
+  // ── Sheet 2: All Clients ──────────────────────────────────
+  var clientRows=[
+    ["Link Name","Client Full Name","Client ID","Status","Subscription Expiry","Days Left","Total Logins","Failed Attempts","Last Login","Last Seen","Note","Is Admin"]
+  ];
+  allLinks.forEach(function(f){
+    var linkName=f.displayName||f.name||"";
+    (f.passwords||[]).forEach(function(u){
+      var exp=u.expiresAt?new Date(u.expiresAt):null;
+      var daysLeft=exp?Math.max(0,Math.ceil((exp-new Date())/86400000)):"∞";
+      var expStr=exp?exp.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):"No expiry";
+      var lastLogin=u.lastLogin?new Date(u.lastLogin).toLocaleString('en-US',{dateStyle:'short',timeStyle:'short'}):"Never";
+      var lastSeen=u.lastSeen?new Date(u.lastSeen).toLocaleString('en-US',{dateStyle:'short',timeStyle:'short'}):"—";
+      var failed=(u.activityLog||[]).filter(function(e){return e.type==='fail';}).length||u.failedAttempts||0;
+      var status=!u.active?"Disabled":(exp&&exp<new Date()?"Expired":"Active");
+      clientRows.push([
+        linkName,
+        u.fullName||u.userId||"",
+        u.userId||"",
+        status,
+        expStr,
+        daysLeft,
+        u.loginCount||0,
+        failed,
+        lastLogin,
+        lastSeen,
+        u.note||"",
+        u.isAdmin?"Yes":"No"
+      ]);
+    });
+  });
+  var wsClients=XLSX.utils.aoa_to_sheet(clientRows);
+  wsClients['!cols']=[{wch:28},{wch:22},{wch:20},{wch:10},{wch:16},{wch:10},{wch:14},{wch:16},{wch:20},{wch:20},{wch:20},{wch:10}];
+  XLSX.utils.book_append_sheet(wb,wsClients,"All Clients");
+
+  // ── Sheet 3: Session Log ──────────────────────────────────
+  var sessionRows=[
+    ["Link Name","Client Full Name","Client ID","Event","Date","Time","Duration","Device","Status"]
+  ];
+  allLinks.forEach(function(f){
+    var linkName=f.displayName||f.name||"";
+    (f.passwords||[]).forEach(function(u){
+      var clientName=u.fullName||u.userId||"";
+      var clientId=u.userId||"";
+      var sortedLog=[].concat(u.activityLog||[]).sort(function(a,b){return a.time-b.time;});
+      var openLogin=null;
+      sortedLog.forEach(function(e){
+        if(e.type==='login'){
+          openLogin={time:e.time,device:e.device||"Unknown"};
+        }else if(e.type==='logout'&&openLogin){
+          var dur=e.sessionSec||Math.round((e.time-openLogin.time)/1000);
+          var dt=new Date(openLogin.time);
+          sessionRows.push([linkName,clientName,clientId,"Session",
+            dt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}),
+            dt.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:true}),
+            fmtDur(dur),openLogin.device,"Completed"]);
+          openLogin=null;
+        }else if(e.type==='fail'){
+          var fdt=new Date(e.time);
+          sessionRows.push([linkName,clientName,clientId,"Failed Attempt",
+            fdt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}),
+            fdt.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:true}),
+            "—",e.device||"Unknown","Failed"]);
+        }
+      });
+      if(openLogin){
+        var odt=new Date(openLogin.time);
+        var isActive=u.lastSeen&&(Date.now()-u.lastSeen)<6*60*1000;
+        sessionRows.push([linkName,clientName,clientId,"Session",
+          odt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}),
+          odt.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:true}),
+          fmtDur(Math.round((Date.now()-openLogin.time)/1000)),
+          openLogin.device,isActive?"Active Now":"Session Open"]);
+      }
+    });
+  });
+  var hdr=sessionRows.shift();
+  sessionRows.sort(function(a,b){return (new Date(b[4]+' '+b[5])||0)-(new Date(a[4]+' '+a[5])||0);});
+  sessionRows.unshift(hdr);
+  var wsSessions=XLSX.utils.aoa_to_sheet(sessionRows);
+  wsSessions['!cols']=[{wch:28},{wch:22},{wch:20},{wch:16},{wch:16},{wch:10},{wch:12},{wch:30},{wch:14}];
+  XLSX.utils.book_append_sheet(wb,wsSessions,"Session Log");
+
+  var date=new Date().toISOString().split('T')[0];
+  XLSX.writeFile(wb,"SunStar_Report_"+date+".xlsx");
+  toast("Excel report downloaded!","ok");
 }
 
 /* ═══════════════════════ UTILS ═══════════════════════ */
