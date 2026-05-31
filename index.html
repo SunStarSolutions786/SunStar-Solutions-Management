@@ -400,7 +400,8 @@ button{font-family:'DM Sans',sans-serif;cursor:pointer;}
 
   /* Toolbar */
   .toolbar{flex-direction:column;gap:8px;margin-bottom:12px;}
-  .toolbar .act-btn{width:100%;justify-content:center;padding:11px;}
+  .search-wrap{width:100%;}
+  .search-inp{font-size:15px;padding:12px 14px 12px 38px;}
 
   /* Link card - fixed layout */
   .link-list{gap:8px;}
@@ -669,7 +670,6 @@ button{font-family:'DM Sans',sans-serif;cursor:pointer;}
   <div class="mob-nav-inner">
     <button class="mob-nav-btn on" id="mob-btn-links" onclick="showPage('links')"><span>🔗</span><span>Links</span></button>
     <button class="mob-nav-btn" id="mob-btn-settings" onclick="showPage('settings')"><span>⚙</span><span>Settings</span></button>
-    <button class="mob-nav-btn" onclick="exportExcel()"><span>📊</span><span>Export</span></button>
   </div>
 </div>
 
@@ -736,11 +736,13 @@ button{font-family:'DM Sans',sans-serif;cursor:pointer;}
       </div>
 
       <div class="toolbar">
+        <div style="display:flex;justify-content:flex-end;">
+          <button class="act-btn" style="color:var(--ok);border-color:rgba(31,209,122,0.25);background:var(--ok-dim);padding:7px 14px;font-size:12px;" onclick="exportExcel()">📊 Export Excel</button>
+        </div>
         <div class="search-wrap">
           <span class="search-ico">🔍</span>
           <input class="search-inp" id="srch" placeholder="Search links..." oninput="filterLinks()"/>
         </div>
-        <button class="act-btn" style="color:var(--ok);border-color:rgba(31,209,122,0.25);background:var(--ok-dim);white-space:nowrap;padding:10px 16px;" onclick="exportExcel()">📊 Export Excel</button>
       </div>
 
       <div class="link-list" id="link-list">
