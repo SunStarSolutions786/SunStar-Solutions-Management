@@ -399,7 +399,8 @@ button{font-family:'DM Sans',sans-serif;cursor:pointer;}
   .stat-icon{font-size:16px;margin-bottom:6px;}
 
   /* Toolbar */
-  .toolbar{flex-direction:column;gap:8px;margin-bottom:12px;}
+  .toolbar{flex-direction:column-reverse;gap:8px;margin-bottom:12px;}
+  .export-btn{align-self:flex-end;padding:7px 12px!important;font-size:12px!important;}
   .search-wrap{width:100%;}
   .search-inp{font-size:15px;padding:12px 14px 12px 38px;}
 
@@ -736,13 +737,11 @@ button{font-family:'DM Sans',sans-serif;cursor:pointer;}
       </div>
 
       <div class="toolbar">
-        <div style="display:flex;justify-content:flex-end;">
-          <button class="act-btn" style="color:var(--ok);border-color:rgba(31,209,122,0.25);background:var(--ok-dim);padding:7px 14px;font-size:12px;" onclick="exportExcel()">📊 Export Excel</button>
-        </div>
         <div class="search-wrap">
           <span class="search-ico">🔍</span>
           <input class="search-inp" id="srch" placeholder="Search links..." oninput="filterLinks()"/>
         </div>
+        <button class="act-btn export-btn" style="color:var(--ok);border-color:rgba(31,209,122,0.25);background:var(--ok-dim);white-space:nowrap;padding:10px 16px;" onclick="exportExcel()">📊 Export Excel</button>
       </div>
 
       <div class="link-list" id="link-list">
