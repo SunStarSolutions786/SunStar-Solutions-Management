@@ -1603,6 +1603,7 @@ function renderClientList(){
       '<div style="display:flex;gap:6px;padding:10px 15px;border-top:1px solid var(--border);flex-wrap:wrap;">'+
         '<button class="act-btn" style="flex:1;justify-content:center;color:var(--info);border-color:rgba(75,159,255,0.2);background:var(--info-dim);font-size:12px;" onclick="openCEdit(\''+u.id+'\')">✏️ Edit</button>'+
         '<button class="act-btn" style="flex:1;justify-content:center;font-size:12px;" onclick="openActivity(\''+u.id+'\')">📊 Activity</button>'+
+        (!u.isAdmin?'<button class="act-btn" style="flex:1;justify-content:center;font-size:12px;color:var(--gold);border-color:rgba(239,168,0,0.2);background:var(--gold-dim);" onclick="extendClient(\''+u.id+'\')">+30 Days</button>':'')+
         '<button class="act-btn" style="flex:1;justify-content:center;font-size:12px;'+(isActive?'color:var(--warn);border-color:rgba(245,158,11,0.2);background:var(--warn-dim);':'color:var(--ok);border-color:rgba(31,209,122,0.2);background:var(--ok-dim);')+'" onclick="toggleClient(\''+u.id+'\','+(isActive?'false':'true')+')">'+(isActive?'⏸ Disable':'▶ Enable')+'</button>'+
         '<button class="act-btn del" style="flex:1;justify-content:center;font-size:12px;" onclick="delClient(\''+u.id+'\')">🗑 Remove</button>'+
       '</div>'+
@@ -1649,10 +1650,28 @@ async function toggleClient(uid2,val){
   }catch(e){toast(e.message,"err");}
 }
 
-async function delClient(uid2){
+async function extendClient(uid2){
   if(!activeDocId)return;
   var f=find(activeDocId);if(!f)return;
-  var u=find2(f,uid2);
+  var u=find2(f,uid2);if(!u)return;
+  try{
+    // Start from today if expired, else from current expiry
+    var base=u.expiresAt&&new Date(u.expiresAt)>new Date()?new Date(u.expiresAt):new Date();
+    var newExpiry=new Date(base.getTime()+30*24*60*60*1000);
+    var pws=(f.passwords||[]).map(function(p){
+      if(p.id!==uid2)return p;
+      return Object.assign({},p,{expiresAt:newExpiry.getTime(),active:true});
+    });
+    await db.collection("links").doc(activeDocId).update({passwords:pws});
+    f.passwords=pws;
+    renderClientList();renderLinks(allLinks);
+    var name=u.fullName||u.userId;
+    var newDateStr=newExpiry.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+    toast('"'+name+'" extended → '+newDateStr,'ok');
+  }catch(e){toast(e.message,'err');}
+}
+
+async function delClient(uid2){
   if(!confirm('Remove "'+(u?u.fullName||u.userId:'this client')+'"?'))return;
   var pws=(f.passwords||[]).filter(function(u){return u.id!==uid2;});
   try{
